@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sistem Kontrak SE2026 BPS</title>
+<link rel="icon" type="image/png" href="https://z-cdn-media.chatglm.cn/files/b8bffa74-ccd7-43df-ac0a-7d38232e3901.png?auth_key=1872868863-b6cd966dc51a4c34aa738032b487a895-0-e6beed34fb7fb9a9650976366f590c26">
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script>
+tailwind.config={theme:{extend:{fontFamily:{outfit:['Outfit','sans-serif']},colors:{navy:{950:'#060b16',900:'#0c1424',800:'#152036',700:'#1e2d4a',600:'#2a3d5e'},gold:{700:'#8a6914',600:'#a67c1a',500:'#c49a2a',400:'#dab43e',300:'#ecc960'},cool:{50:'#f0f4f8',100:'#e1e7ef',200:'#c9d1dc',300:'#8b95a5'}}}}}
+</script>
+<style>
+*{scrollbar-width:thin;scrollbar-color:#c49a2a transparent}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:#c49a2a;border-radius:3px}
+body{font-family:'Outfit',sans-serif}
+.nav-item{transition:all .2s}.nav-item:hover{background:rgba(212,180,62,.1)}
+.nav-item.active{background:rgba(212,180,62,.15);color:#dab43e;border-right:3px solid #dab43e}
+.nav-item .badge{background:#c49a2a;color:#fff;font-size:9px;min-width:18px;height:18px;border-radius:9px;display:inline-flex;align-items:center;justify-content:center;font-weight:700}
+.fade-in{animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.toast-in{animation:tIn .3s ease}
+@keyframes tIn{from{opacity:0;transform:translateX(50px)}to{opacity:1;transform:translateX(0)}}
+.toast-out{animation:tOut .25s ease forwards}
+@keyframes tOut{to{opacity:0;transform:translateX(50px)}}
+.btn-p{background:linear-gradient(135deg,#0a36c4,#2b6bec);color:#fff;transition:all .2s}
+.btn-p:hover{background:linear-gradient(135deg,#8a6914,#a67c1a);transform:translateY(-1px);box-shadow:0 4px 14px rgba(196,154,42,.35)}
+.btn-d{background:linear-gradient(135deg,#b91c1c,#dc2626);color:#fff;transition:all .2s}
+.btn-d:hover{transform:translateY(-1px)}
+.btn-g{border:1px solid #c9d1dc;color:#152036;transition:all .2s}
+.btn-g:hover{border-color:#c49a2a;color:#a67c1a;background:rgba(196,154,42,.04)}
+.btn-print{background:linear-gradient(135deg,#1e3a5f,#2563eb);color:#fff;transition:all .2s}
+.btn-print:hover{background:linear-gradient(135deg,#1e3a5f,#1d4ed8);transform:translateY(-1px);box-shadow:0 4px 14px rgba(37,99,235,.3)}
+input:focus,select:focus,textarea:focus{outline:none;border-color:#c49a2a!important;box-shadow:0 0 0 3px rgba(196,154,42,.1)}
+.tbl-row{transition:background .12s}.tbl-row:hover{background:rgba(37,99,235,.04)}
+.pulse-dot{width:7px;height:7px;border-radius:50%;background:#16a34a;animation:pu 2s infinite}
+@keyframes pu{0%,100%{opacity:1}50%{opacity:.35}}
+.modal-bg{backdrop-filter:blur(4px)}
+.date-badge{display:inline-flex;align-items:center;gap:4px;padding:1px 6px;border-radius:5px;font-size:10px;font-family:'Outfit',sans-serif}
+.date-badge.global{background:#eff6ff;color:#3b5bdb}
+.date-badge.custom{background:#fef3c7;color:#92400e}
+.nomor-auto{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:10px 16px;font-family:'Courier New',monospace;font-size:14px;font-weight:700;letter-spacing:.5px;color:#166534;display:flex;align-items:center;gap:10px}
+.nomor-auto i{color:#22c55e;font-size:12px}
+.nomor-auto .label{font-family:'Outfit',sans-serif;font-size:10px;font-weight:500;color:#15803d;text-transform:uppercase;letter-spacing:.5px}
+@media print{.no-print{display:none!important}.tbl-scroll{max-height:none!important;overflow:visible!important}}
+.sb-logo{width:42px;height:42px;border-radius:10px;object-fit:contain;flex-shrink:0;background:rgba(255,255,255,0.08);padding:4px}
+.sb-title-wrap{min-height:32px;display:flex;flex-direction:column;justify-content:center}
+.tbl-scroll{overflow-x:auto;overflow-y:auto;max-height:65vh;border-radius:0 0 1rem 1rem}
+@media(max-width:640px){.tbl-scroll{max-height:50vh}}
+.tbl-scroll table{width:100%;border-collapse:separate;border-spacing:0}
+.tbl-scroll thead{position:sticky;top:0;z-index:10}
+.tbl-scroll thead th{background:linear-gradient(135deg,#094dbc,#094dbc);color:rgba(255,255,255,0.92);border-bottom:2.5px solid #c49a2a;font-size:11px;font-weight:600;letter-spacing:.03em;text-transform:uppercase;box-shadow:0 4px 12px rgba(12,26,48,0.25);position:relative}
+.tbl-scroll thead th::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,#c49a2a,#ecc960 50%,#c49a2a);opacity:.7}
+.flt-active{background:#0c1424!important;color:#dab43e!important;border-color:#c49a2a!important}
+.hero-bg{background:linear-gradient(135deg,#0a36c4 20%,#0b1a38 45%,#10264a 100%,#0a36c4 70%);position:relative;overflow:hidden}
+.hero-bg::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.035) 1px,transparent 1px);background-size:22px 22px;pointer-events:none}
+.hero-bg::after{content:'';position:absolute;top:-30%;right:-15%;width:500px;height:500px;background:radial-gradient(circle,rgba(37,99,235,0.08),transparent 70%);pointer-events:none}
+.hero-glow{position:absolute;bottom:-40%;left:10%;width:400px;height:400px;background:radial-gradient(circle,rgba(196,154,42,0.06),transparent 70%);pointer-events:none}
+.hero-wave{position:absolute;bottom:-1px;left:0;right:0;height:36px;overflow:hidden}
+.hero-wave svg{position:absolute;bottom:0;width:200%;height:100%;animation:waveDrift 20s linear infinite}
+@keyframes waveDrift{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+.glass{background:rgba(255,255,255,0.06);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,0.09);border-radius:16px;transition:all .25s}
+.glass:hover{background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.15);transform:translateY(-2px)}
+.glass .g-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.dist-bar{height:26px;border-radius:6px;transition:width .7s cubic-bezier(.22,1,.36,1);min-width:3px;position:relative}
+.dist-bar .dist-tip{position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:10px;font-weight:700;color:rgba(255,255,255,0.9);white-space:nowrap}
+.stat-num{font-size:1.75rem;font-weight:800;line-height:1;letter-spacing:-.02em}
+.hero-logo-ring{width:100px;height:100px;border-radius:24px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;position:relative}
+.hero-logo-ring img{width:72px;height:auto;filter:drop-shadow(0 0 12px rgba(196,154,42,0.2))}
+.hero-logo-ring::after{content:'';position:absolute;inset:-6px;border-radius:28px;border:1px solid rgba(196,154,42,0.12);animation:ringPulse 3s ease-in-out infinite}
+@keyframes ringPulse{0%,100%{opacity:.3;transform:scale(1)}50%{opacity:.7;transform:scale(1.03)}}
+.empty-hero{background:linear-gradient(135deg,#03194f,#0f1f3d);border-radius:24px;position:relative;overflow:hidden}
+.empty-hero::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:24px 24px}
+@media(max-width:640px){.stat-num{font-size:1.35rem}.hero-logo-ring{width:72px;height:72px;border-radius:18px}.hero-logo-ring img{width:52px}}
+.toggle-switch{position:relative;width:30px;height:16px;cursor:pointer;display:inline-block;flex-shrink:0}
+.toggle-switch input{opacity:0;width:0;height:0}
+.toggle-slider{position:absolute;inset:0;background:#d1d5db;border-radius:16px;transition:all .2s}
+.toggle-slider::before{content:'';position:absolute;width:12px;height:12px;border-radius:50%;background:#fff;top:2px;left:2px;transition:all .2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.toggle-switch input:checked+.toggle-slider{background:#16a34a}
+.toggle-switch input:checked+.toggle-slider::before{transform:translateX(14px)}
+.status-aktif{display:inline-flex;align-items:center;gap:2px;padding:0 4px;border-radius:4px;font-size:9px;font-weight:600;background:#f0fdf4;color:#166534;white-space:nowrap;line-height:16px}
+.status-nonaktif{display:inline-flex;align-items:center;gap:2px;padding:0 4px;border-radius:4px;font-size:9px;font-weight:600;background:#e8edf3;color:#64748b;white-space:nowrap;line-height:16px}
+.status-aktif i,.status-nonaktif i{font-size:7px}
+.ctbl thead th{padding:4px 10px;font-size:11px}
+.ctbl tbody td{padding:3px 10px;font-size:12px;line-height:1.35}
+.ctbl-compact thead th{padding:9px 10px;font-size:12px;letter-spacing:.04em}
+.ctbl-compact tbody td{padding:2px 8px;font-size:12.5px;line-height:1.3}
+.ctbl-compact .st-cell{vertical-align:middle}
+.pag-btn{width:28px;height:28px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;cursor:pointer;border:none;transition:all .15s}
+.pag-btn:hover:not(:disabled){background:#e1e7ef}
+.pag-btn:disabled{opacity:.35;cursor:default}
+.pag-btn.active{background:#0c1424;color:#dab43e;font-weight:700}
+.pag-dots{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;color:#9ca3af;letter-spacing:1px}
+.nomor-kontrak-badge{display:inline-flex;align-items:center;gap:0;background:linear-gradient(135deg,#0c1424,#1e2d4a);color:#dab43e;padding:2px 8px;border-radius:5px;font-family:'Courier New',monospace;font-size:10px;font-weight:700;letter-spacing:.3px;white-space:nowrap;border:1px solid rgba(196,154,42,0.2);line-height:18px}
+.nomor-kontrak-badge .nk-slash{color:rgba(212,180,62,0.45);margin:0 1px}
+.nomor-kontrak-badge.dup{border-color:#ef4444!important;background:linear-gradient(135deg,#450a0a,#7f1d1d)!important;color:#fca5a5!important}
+.fg{margin-bottom:0}
+.fg-label{display:block;font-size:11px;font-weight:600;color:#64748b;margin-bottom:3px;letter-spacing:.01em}
+.fg-label .req{color:#ef4444;margin-left:1px}
+.fg-input{width:100%;padding:7px 10px;border-radius:8px;border:1.5px solid #e2e8f0;font-size:13px;line-height:1.4;transition:all .15s;background:#fff}
+.fg-input::placeholder{color:#cbd5e1;font-size:12px}
+.fg-ro{background:#f8fafc;color:#64748b;cursor:default}
+.fg-hint{font-size:10px;color:#94a3b8;margin-top:2px}
+.fg-hint i{margin-right:3px}
+.f-section{border:1px solid #e2e8f0;border-radius:10px;overflow:hidden}
+.f-section-hd{display:flex;align-items:center;gap:6px;padding:7px 12px;background:linear-gradient(135deg,#f8fafc,#f1f5f9);border-bottom:1px solid #e2e8f0;font-size:12px;font-weight:700;color:#334155;letter-spacing:.02em}
+.f-section-hd i{font-size:11px;width:18px;height:18px;border-radius:5px;display:inline-flex;align-items:center;justify-content:center}
+.f-section-hd .shd-gold{background:linear-gradient(135deg,#fef3c7,#fde68a);color:#92400e}
+.f-section-hd .shd-blue{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#1e40af}
+.f-section-hd .shd-green{background:linear-gradient(135deg,#dcfce7,#bbf7d0);color:#166534}
+.f-section-hd .shd-purple{background:linear-gradient(135deg,#f3e8ff,#e9d5ff);color:#6b21a8}
+.f-section-hd .shd-orange{background:linear-gradient(135deg,#ffedd5,#fed7aa);color:#c2410c}
+.f-section-bd{padding:10px 12px}
+.f-row{display:grid;gap:8px}
+.f-row-2{grid-template-columns:1fr 1fr}
+.f-row-3{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:640px){.f-row-2,.f-row-3{grid-template-columns:1fr}}
+.nk-compact{display:flex;align-items:center;gap:8px;background:linear-gradient(135deg,#f0fdf4,#ecfdf5);border:1.5px solid #86efac;border-radius:8px;padding:6px 12px;font-family:'Courier New',monospace;font-size:12.5px;font-weight:700;color:#166534;letter-spacing:.3px;transition:all .2s}
+.nk-compact.dup-warn{background:linear-gradient(135deg,#fef2f2,#fee2e2);border-color:#fca5a5;color:#dc2626}
+.nk-compact.locked{background:linear-gradient(135deg,#f0f4f8,#e8edf3);border-color:#94a3b8;color:#475569}
+.nk-compact i{font-size:10px;flex-shrink:0}
+.nk-compact .nk-label{font-family:'Outfit',sans-serif;font-size:9px;font-weight:600;color:#15803d;text-transform:uppercase;letter-spacing:.5px;line-height:1}
+.nk-compact.locked .nk-label{color:#64748b}
+.nk-compact.dup-warn .nk-label{color:#991b1b}
+.tgl-chip{display:inline-flex;align-items:center;gap:3px;font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px}
+.tgl-chip.from-global{background:#eff6ff;color:#2563eb}
+.tgl-chip.from-custom{background:#fef3c7;color:#d97706}
+.tgl-chip.from-calc{background:#f0fdf4;color:#16a34a}
+.dup-warn-bar{display:flex;align-items:center;gap:6px;padding:6px 10px;background:#fef2f2;border:1px solid #fecaca;border-radius:6px;font-size:10.5px;color:#dc2626;animation:dupPulse 1.5s ease-in-out infinite}
+@keyframes dupPulse{0%,100%{border-color:#fecaca}50%{border-color:#ef4444}}
+.sel-cb{width:16px;height:16px;border-radius:4px;cursor:pointer;accent-color:#0a36c4;flex-shrink:0}
+.tbl-row.row-sel{background:rgba(10,54,196,0.06)!important}
+.floating-bar{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);background:linear-gradient(135deg,#0c1424,#1a2940);color:#fff;border-radius:16px;padding:10px 20px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,0.35),0 0 0 1px rgba(196,154,42,0.15);z-index:40;transition:transform .35s cubic-bezier(.22,1,.36,1),opacity .3s;opacity:0;pointer-events:none;white-space:nowrap}
+.floating-bar.show{transform:translateX(-50%) translateY(0);opacity:1;pointer-events:auto}
+.floating-bar .fb-count{font-size:13px;font-weight:700;color:#dab43e}
+.floating-bar .fb-label{font-size:12px;color:rgba(255,255,255,0.6)}
+.floating-bar .fb-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .15s}
+.floating-bar .fb-btn-print{background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,0.4)}
+.floating-bar .fb-btn-print:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);transform:translateY(-1px)}
+.floating-bar .fb-btn-cancel{background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);border:1px solid rgba(255,255,255,0.15)}
+.floating-bar .fb-btn-cancel:hover{background:rgba(255,255,255,0.15)}
+.floating-bar .fb-sep{width:1px;height:24px;background:rgba(255,255,255,0.1)}
+.sel-toggle-btn{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;border:1.5px solid #c9d1dc;color:#475569;background:#fff;transition:all .2s}
+.sel-toggle-btn:hover{border-color:#0a36c4;color:#0a36c4;background:#eff6ff}
+.sel-toggle-btn.active{background:#0c1424;color:#dab43e;border-color:#c49a2a}
+.sel-toggle-btn.active:hover{background:#152036}
+.jenis-chip{display:inline-flex;align-items:center;gap:3px;padding:1px 7px;border-radius:5px;font-size:9.5px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.jenis-chip.pcl{background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd}
+.jenis-chip.pcl-ub{background:#fef3c7;color:#92400e;border:1px solid #fde68a}
+.snap-badge{display:inline-flex;align-items:center;gap:3px;font-size:9.5px;font-weight:600;padding:1px 6px;border-radius:4px;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;white-space:nowrap}
+.snap-badge i{font-size:8px}
+.qs-step{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;background:#fff;border:1px solid #e2e8f0;transition:all .2s;cursor:pointer}
+.qs-step:hover{border-color:#c49a2a;box-shadow:0 2px 12px rgba(196,154,42,.12);transform:translateY(-1px)}
+.qs-step .qs-num{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+.qs-step.done .qs-num{background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0}
+.qs-step.pending .qs-num{background:#fef3c7;color:#d97706;border:1px solid #fde68a}
+.qs-step .qs-text{flex:1}
+.qs-step .qs-title{font-size:12px;font-weight:700;color:#1e293b}
+.qs-step .qs-desc{font-size:10px;color:#94a3b8;margin-top:1px}
+.qs-step .qs-icon{font-size:11px;color:#c49a2a}
+@keyframes qsBounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+.qs-arrow{animation:qsBounce 1.5s ease-in-out infinite;display:inline-block}
+.ss-wrap{position:relative}
+.ss-trigger{display:flex;align-items:center;justify-content:space-between;padding:5px 8px;border-radius:6px;border:1.5px solid #e2e8f0;font-size:12px;cursor:pointer;background:#fff;transition:all .15s;min-height:30px;gap:4px;user-select:none}
+.ss-trigger:hover{border-color:#cbd5e1}
+.ss-trigger.open{border-color:#c49a2a;box-shadow:0 0 0 3px rgba(196,154,42,.1)}
+.ss-display{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#0f172a;line-height:1.3}
+.ss-display.ph{color:#cbd5e1;font-style:italic}
+.ss-arrow{flex-shrink:0;color:#94a3b8;font-size:9px;transition:transform .2s}
+.ss-trigger.open .ss-arrow{transform:rotate(180deg)}
+.ss-panel{position:fixed;background:#fff;border:1.5px solid #e2e8f0;border-radius:10px;box-shadow:0 10px 32px rgba(0,0,0,.14),0 2px 8px rgba(0,0,0,.06);z-index:99999;display:none;overflow:hidden;min-width:180px}
+.ss-panel.show{display:block;animation:ssIn .15s ease}
+@keyframes ssIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}
+.ss-search{padding:6px 8px;border-bottom:1px solid #f1f5f9;position:relative}
+.ss-search input{width:100%;padding:4px 8px 4px 24px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:11px;outline:none;transition:border-color .15s;background:#fafbfc}
+.ss-search input:focus{border-color:#c49a2a;background:#fff}
+.ss-search>i{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:9px;pointer-events:none}
+.ss-list{max-height:200px;overflow-y:auto;padding:3px}
+.ss-list::-webkit-scrollbar{width:4px}
+.ss-list::-webkit-scrollbar-thumb{background:#d1d5db;border-radius:2px}
+.ss-opt{padding:5px 8px;border-radius:5px;cursor:pointer;font-size:11.5px;display:flex;align-items:center;gap:6px;line-height:1.3;transition:opacity .1s}
+.ss-opt:hover{background:#f0f4f8}
+.ss-opt.active{background:#0c1424;color:#dab43e;font-weight:600}
+.ss-opt.special{color:#64748b;font-style:italic;border-top:1px solid #f1f5f9;margin-top:2px;padding-top:6px}
+.ss-opt .ss-ol{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ss-opt .ss-oe{font-size:9.5px;color:#94a3b8;flex-shrink:0;font-family:'Courier New',monospace;letter-spacing:-.02em}
+.ss-opt.active .ss-oe{color:rgba(212,180,62,.55)}
+.ss-nores{padding:12px 14px;text-align:center;color:#94a3b8;font-size:11px}
+.ss-nores i{display:block;font-size:16px;margin-bottom:3px;opacity:.4}
+@media print{.floating-bar{display:none!important}}
+.nilai-match{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 7px;border-radius:5px;font-weight:600}
+.nilai-match.ok{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.nilai-match.mismatch{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.nilai-match.neutral{background:#f8fafc;color:#64748b;border:1px solid #e2e8f0}
+</style>
+</head>
+<body class="bg-cool-50 text-navy-900 min-h-screen">
+
+<button id="menuBtn" class="lg:hidden fixed top-4 left-4 z-50 w-10 h-10 bg-navy-900 text-gold-400 rounded-xl flex items-center justify-center shadow-lg no-print" onclick="toggleSB()"><i class="fas fa-bars"></i></button>
+<div id="sbBg" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden no-print" onclick="toggleSB()"></div>
+
+<aside id="sb" class="fixed top-0 left-0 h-full w-60 bg-gradient-to-b from-navy-900 to-navy-800 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col no-print">
+<div class="px-4 py-4 border-b border-navy-700/60">
+<div class="flex items-center gap-3">
+<img src="https://z-cdn-media.chatglm.cn/files/b8bffa74-ccd7-43df-ac0a-7d38232e3901.png?auth_key=1872868863-b6cd966dc51a4c34aa738032b487a895-0-e6beed34fb7fb9a9650976366f590c26" alt="Logo BPS" class="sb-logo">
+<div class="sb-title-wrap">
+<h1 id="sbTitle" class="text-gold-400 font-bold text-sm leading-tight transition-all duration-200">Dashboard</h1>
+<p class="text-gold-300/50 text-[10px] mt-0.5">BPS Kota Pekanbaru</p>
+</div>
+</div>
+</div>
+<nav class="flex-1 py-3 px-2 space-y-0.5 overflow-y-auto">
+<p class="text-[9px] text-gray-600 uppercase tracking-wider font-semibold px-4 pt-2 pb-1">Utama</p>
+<button class="nav-item active w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400" data-v="dashboard" onclick="nav('dashboard')"><i class="fas fa-chart-pie w-5 text-center text-xs"></i>Dashboard</button>
+<p class="text-[9px] text-gray-600 uppercase tracking-wider font-semibold px-4 pt-3 pb-1">Data Referensi</p>
+<button class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400" data-v="dbmitra" onclick="nav('dbmitra')"><i class="fas fa-address-book w-5 text-center text-xs"></i>Database Mitra <span id="bdgDb" class="badge ml-auto hidden">0</span></button>
+<p class="text-[9px] text-gray-600 uppercase tracking-wider font-semibold px-4 pt-3 pb-1">Kontrak SE2026</p>
+<button class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400" data-v="mitra" onclick="nav('mitra')"><i class="fas fa-file-contract w-5 text-center text-xs"></i>Kontrak PCL <span id="bdgKon" class="badge ml-auto hidden">0</span></button>
+<p class="text-[9px] text-gray-600 uppercase tracking-wider font-semibold px-4 pt-3 pb-1">Sistem</p>
+<button class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400" data-v="settings" onclick="nav('settings')"><i class="fas fa-cog w-5 text-center text-xs"></i>Pengaturan</button>
+<button class="nav-item w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm text-gray-400" data-v="exim" onclick="nav('exim')"><i class="fas fa-file-export w-5 text-center text-xs"></i>Export / Import</button>
+</nav>
+<div class="px-5 py-3 border-t border-navy-700/60"><div class="flex items-center gap-2"><div class="pulse-dot"></div><span id="svSt" class="text-[10px] text-gray-500">Belum ada data</span></div></div>
+</aside>
+
+<main id="mc" class="lg:ml-60 min-h-screen p-4 lg:p-8 pt-16 lg:pt-0"></main>
+
+<div id="floatingBar" class="floating-bar no-print">
+<span class="fb-count" id="fbCount">0</span>
+<span class="fb-label">dipilih</span>
+<div class="fb-sep"></div>
+<button class="fb-btn fb-btn-print" onclick="printMultiple()"><i class="fas fa-print"></i>Cetak Semua</button>
+<button class="fb-btn fb-btn-cancel" onclick="deselAll()"><i class="fas fa-times"></i>Batal</button>
+</div>
+
+<div id="mOv" class="fixed inset-0 bg-black/60 z-50 hidden items-start justify-center overflow-y-auto py-3 modal-bg no-print">
+<div id="mBd" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl mx-3 relative fade-in">
+<div class="sticky top-0 bg-white border-b border-cool-200 px-5 py-3 rounded-t-2xl flex justify-between items-center z-10">
+<h2 id="mTi" class="text-base font-bold flex items-center gap-2"></h2>
+<div class="flex items-center gap-2">
+<span id="mPrintBtn" class="hidden"></span>
+<button onclick="cM()" class="w-7 h-7 rounded-lg hover:bg-cool-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition text-sm"><i class="fas fa-times"></i></button>
+</div>
+</div>
+<div id="mIn" class="p-5"></div>
+</div>
+</div>
+
+<div id="cfOv" class="fixed inset-0 bg-black/60 z-[60] hidden items-center justify-center modal-bg no-print">
+<div class="bg-white rounded-2xl shadow-2xl w-full max-w-sm mx-4 p-6 fade-in text-center">
+<div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4"><i class="fas fa-exclamation-triangle text-red-500 text-xl"></i></div>
+<h3 id="cfTi" class="font-bold text-lg mb-2"></h3>
+<p id="cfMs" class="text-gray-500 text-sm mb-6"></p>
+<div class="flex gap-3 justify-center">
+<button onclick="cCf()" class="btn-g px-5 py-2.5 rounded-xl text-sm font-medium">Batal</button>
+<button id="cfBn" class="btn-d px-5 py-2.5 rounded-xl text-sm font-medium">Hapus</button>
+</div>
+</div>
+</div>
+
+<div id="tC" class="fixed top-4 right-4 z-[9999] flex flex-col gap-2 pointer-events-none no-print"></div>
+
+<script>
+const VNAMES={dashboard:'Dashboard',dbmitra:'Database Mitra',mitra:'Kontrak PCL',settings:'Pengaturan',exim:'Export / Import'};
+const VNAMES_ICONS={dashboard:'fa-chart-pie',dbmitra:'fa-address-book',mitra:'fa-file-contract',settings:'fa-cog',exim:'fa-file-export'};
+const BL=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+const HR=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
+const S={v:'dashboard',set:{ppkNama:'',ppkNip:'',bpsNama:'Badan Pusat Statistik Kota Pekanbaru',bpsAlamat:'Jl. Rawa Indah No. 2',kota:'Pekanbaru',honorMaks:0,tglTandaTangan:'',tglSelesai:''},mitra:[],dbMitra:[]};
+const $=id=>document.getElementById(id);
+const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
+function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
+function fRp(n){if(!n&&n!==0)return'-';return'Rp '+Number(n).toLocaleString('id-ID')}
+function fTgl(d){if(!d)return'-';return new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'})}
+function fTglShort(d){if(!d)return'-';return new Date(d).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'})}
+function terbilang(n){if(n===0)return'nol';const s=['','satu','dua','tiga','empat','lima','enam','tujuh','delapan','sembilan'],b=['','ribu','juta','miliar','triliun'],bl=['sebelas','dua belas','tiga belas','empat belas','lima belas','enam belas','tujuh belas','delapan belas','sembilan belas'];let r='',neg=false;if(n<0){neg=true;n=-n}n=Math.floor(n);let i=0;while(n>0){let c=n%1000;n=Math.floor(n/1000);let cs='',cO=c;if(c>=100){const h=Math.floor(c/100);cs+=(h===1?'seratus':s[h]+' ratus')+' ';c%=100}if(c>=11&&c<=19)cs+=bl[c-11]+' ';else if(c===10)cs+='sepuluh ';else if(c>=20){cs+=s[Math.floor(c/10)]+' puluh ';c%=10;if(c>0)cs+=s[c]+' '}else if(c>0)cs+=s[c]+' ';if(cO===1&&i===1&&n===0)cs='seribu ';else if(cO>0)cs+=b[i]+' ';r=cs+r;i++}return(neg?'minus ':'')+r.trim()}
+function updBadges(){const b1=$('bdgDb'),b3=$('bdgKon');if(S.dbMitra.length){b1.textContent=S.dbMitra.length;b1.classList.remove('hidden')}else b1.classList.add('hidden');if(S.mitra.length){b3.textContent=S.mitra.length;b3.classList.remove('hidden')}else b3.classList.add('hidden')}
+function getMitraTglTT(m){return m.tglTandaTangan||S.set.tglTandaTangan||''}
+function getNextSeq(tglTT,excludeId){if(!tglTT)return 1;const existing=S.mitra.filter(m=>{if(excludeId&&m.id===excludeId)return false;return getMitraTglTT(m)===tglTT&&m.nomorKontrak});const usedSeqs=new Set();existing.forEach(m=>{const parts=m.nomorKontrak.split('/');if(parts.length===4){const seq=parseInt(parts[0].substring(4));if(seq>0)usedSeqs.add(seq)}});let seq=1;while(usedSeqs.has(seq))seq++;return seq}
+function pad2(n){return String(n).padStart(2,'0')}
+function getNomorPreview(formTT,excludeId){const tglTT=formTT||S.set.tglTandaTangan||'';if(!tglTT)return{nomor:'-',isDup:false,conflictWith:''};const d=new Date(tglTT),dd=pad2(d.getDate()),mm=pad2(d.getMonth()+1),yyyy=d.getFullYear();const seq=getNextSeq(tglTT,excludeId);const nomor=dd+mm+String(seq).padStart(3,'0')+'/PPK/SE2026/'+yyyy;const conflict=S.mitra.find(m=>m.id!==excludeId&&m.nomorKontrak===nomor);return{nomor,isDup:!!conflict,conflictWith:conflict?conflict.nama:''}}
+function regenAllNomor(){const groups={};S.mitra.forEach(m=>{const ttd=getMitraTglTT(m);if(!ttd)return;const d=new Date(ttd);const key=pad2(d.getDate())+pad2(d.getMonth()+1)+d.getFullYear();if(!groups[key])groups[key]={ddmm:key.substring(0,4),yyyy:key.substring(4),items:[]};groups[key].items.push(m)});Object.values(groups).forEach(g=>{g.items.sort((a,b)=>new Date(a.createdAt||0)-new Date(b.createdAt||0));const usedNums=new Set();g.items.forEach(m=>{if(m.nomorKontrak){const parts=m.nomorKontrak.split('/');if(parts.length===4&&parts[0].startsWith(g.ddmm)){const seq=parseInt(parts[0].substring(4));if(seq>0)usedNums.add(seq)}}});g.items.forEach(m=>{if(!m.nomorKontrak||m.nomorKontrak.trim()===''){let seq=1;while(usedNums.has(seq))seq++;m.nomorKontrak=g.ddmm+String(seq).padStart(3,'0')+'/PPK/SE2026/'+g.yyyy;usedNums.add(seq)}})})}
+function fixDuplicates(){const used=new Set();[...S.mitra].sort((a,b)=>new Date(a.createdAt||0)-new Date(b.createdAt||0)).forEach(m=>{if(!m.nomorKontrak)return;if(used.has(m.nomorKontrak)){const ttd=getMitraTglTT(m);if(!ttd)return;const d=new Date(ttd);const ddmm=pad2(d.getDate())+pad2(d.getMonth());const yyyy=d.getFullYear();let seq=1,newNomor;do{newNomor=ddmm+String(seq).padStart(3,'0')+'/PPK/SE2026/'+yyyy;seq++}while(used.has(newNomor));m.nomorKontrak=newNomor}used.add(m.nomorKontrak)})}
+function findDuplicates(){const map=new Map(),dups=[];S.mitra.forEach(m=>{if(!m.nomorKontrak)return;if(map.has(m.nomorKontrak))dups.push({nomor:m.nomorKontrak,existing:map.get(m.nomorKontrak),duplicate:m});else map.set(m.nomorKontrak,m)});return dups}
+function formatNomorBadge(nomor,isDup){if(!nomor)return'-';const parts=nomor.split('/');const cls=isDup?'nomor-kontrak-badge dup':'nomor-kontrak-badge';if(parts.length===4)return'<span class="'+cls+'" title="'+(isDup?'NOMOR DUPLIKAT!':'')+'">'+parts[0]+'<span class="nk-slash">/</span>'+parts[1]+'<span class="nk-slash">/</span>'+parts[2]+'<span class="nk-slash">/</span>'+parts[3]+(isDup?' <i class="fas fa-exclamation-triangle" style="font-size:9px"></i>':'')+'</span>';return'<span class="'+cls+'">'+nomor+'</span>'}
+function toast(msg,type='success'){const ic={success:'fa-check-circle text-green-500',error:'fa-times-circle text-red-500',warning:'fa-exclamation-circle text-amber-500',info:'fa-info-circle text-blue-500'},bg={success:'border-green-200',error:'border-red-200',warning:'border-amber-200',info:'border-blue-200'};const el=document.createElement('div');el.className='toast-in pointer-events-auto flex items-center gap-3 bg-white border '+bg[type]+' rounded-xl shadow-lg px-4 py-3 min-w-[280px] max-w-[400px]';el.innerHTML='<i class="fas '+ic[type]+'"></i><span class="text-sm text-gray-700 flex-1">'+msg+'</span>';$('tC').appendChild(el);setTimeout(()=>{el.classList.replace('toast-in','toast-out');setTimeout(()=>el.remove(),250)},3000)}
+let svT=null;
+function aSave(){clearTimeout(svT);svT=setTimeout(()=>{try{localStorage.setItem('se2026App',JSON.stringify({v:S.v,set:S.set,mitra:S.mitra,dbMitra:S.dbMitra}));S.lastSaved=new Date();$('svSt').textContent='©Putu_'+S.lastSaved.toLocaleTimeString('id-ID')}catch(e){}},400)}
+function loadS(){try{const d=JSON.parse(localStorage.getItem('se2026App'));if(d){if(d.v)S.v=d.v;if(d.set)Object.assign(S.set,d.set);if(d.mitra)S.mitra=d.mitra;if(d.dbMitra)S.dbMitra=d.dbMitra}else S.dbMitra=getSampleDbMitra();S.dbMitra.forEach(m=>{if(m.aktif===undefined)m.aktif=true});regenAllNomor();if(S.mitra.length||S.dbMitra.length)$('svSt').textContent='Data tersimpan'}catch(e){if(!S.dbMitra.length)S.dbMitra=getSampleDbMitra()}}
+function toggleSB(){$('sb').classList.toggle('-translate-x-full');$('sbBg').classList.toggle('hidden')}
+function nav(v){S.v=v;_selMitra.clear();_selMode=false;document.querySelectorAll('.nav-item').forEach(el=>el.classList.toggle('active',el.dataset.v===v));const titleEl=$('sbTitle');if(titleEl){titleEl.style.opacity='0';titleEl.style.transform='translateY(-4px)';setTimeout(()=>{titleEl.innerHTML='<i class="fas '+(VNAMES_ICONS[v]||'fa-file')+' mr-1.5 text-[11px] opacity-70"></i>'+(VNAMES[v]||'Dashboard');titleEl.style.opacity='1';titleEl.style.transform='translateY(0)'},120)}document.title=(VNAMES[v]||'Dashboard')+' — SE2026 BPS';aSave();render();if(window.innerWidth<1024)toggleSB()}
+function oM(t,h,showPrint,mid){$('mTi').innerHTML=t;$('mIn').innerHTML=h;if(showPrint&&mid){$('mPrintBtn').innerHTML='<button onclick="cM();setTimeout(function(){printK(\''+mid+'\')},150)" class="btn-print px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2"><i class="fas fa-print"></i>Cetak</button>';$('mPrintBtn').classList.remove('hidden')}else $('mPrintBtn').classList.add('hidden');$('mOv').classList.remove('hidden');$('mOv').classList.add('flex');document.body.style.overflow='hidden'}
+function cM(){ssCloseAll();$('mOv').classList.add('hidden');$('mOv').classList.remove('flex');document.body.style.overflow=''}
+let cfCb=null;
+function oCf(t,m,cb){$('cfTi').textContent=t;$('cfMs').textContent=m;cfCb=cb;$('cfOv').classList.remove('hidden');$('cfOv').classList.add('flex')}
+function cCf(){$('cfOv').classList.add('hidden');$('cfOv').classList.remove('flex');cfCb=null}
+ $('cfBn').addEventListener('click',()=>{if(cfCb)cfCb();cCf()});
+
+const _ssCb={};
+function ssHTML(id,opts,selected,placeholder){placeholder=placeholder||'-- Pilih --';const selOpt=opts.find(o=>o.value===selected&&!o.hidden);const dt=selOpt?selOpt.label:placeholder;const isPh=!selOpt;let h='<div class="ss-wrap" id="ss-'+id+'"><div class="ss-trigger" onclick="ssToggle(\''+id+'\')"><span class="ss-display'+(isPh?' ph':'')+'">'+esc(dt)+'</span><i class="fas fa-chevron-down ss-arrow"></i></div><div class="ss-panel" id="ssp-'+id+'"><div class="ss-search"><i class="fas fa-search"></i><input type="text" placeholder="Ketik untuk mencari..." oninput="ssFilter(\''+id+'\',this.value)" onkeydown="ssKeyNav(event,\''+id+'\')"></div><div class="ss-list" id="ssl-'+id+'">';opts.forEach(o=>{if(o.hidden)return;const cls=(o.value===selected?' active':'')+(o.special?' special':'');h+='<div class="ss-opt'+cls+'" data-val="'+esc(o.value)+'" onmousedown="ssPick(\''+id+'\',this.dataset.val)"><span class="ss-ol">'+esc(o.label)+'</span>';if(o.extra)h+='<span class="ss-oe">'+esc(o.extra)+'</span>';h+='</div>'});h+='</div></div></div>';return h}
+function ssInit(id,cb){_ssCb[id]=cb}
+function ssToggle(id){ssCloseAll(id);const panel=$('ssp-'+id),wrap=$('ss-'+id);if(!panel||!wrap)return;const trigger=wrap.querySelector('.ss-trigger');const isOpen=panel.classList.contains('show');if(isOpen){panel.classList.remove('show');trigger?.classList.remove('open')}else{panel.classList.add('show');trigger?.classList.add('open');ssPosition(id);const inp=panel.querySelector('.ss-search input');if(inp){inp.value='';ssFilter(id,'');setTimeout(()=>inp.focus(),60)}}}
+function ssPosition(id){const trigger=document.querySelector('#ss-'+id+' .ss-trigger'),panel=$('ssp-'+id);if(!trigger||!panel)return;const r=trigger.getBoundingClientRect(),vw=window.innerWidth;let w=r.width;if(w<200)w=200;let left=r.left;if(left+w>vw-8)left=vw-w-8;if(left<8)left=8;panel.style.top=(r.bottom+4)+'px';panel.style.left=left+'px';panel.style.width=w+'px'}
+function ssCloseAll(exceptId){document.querySelectorAll('.ss-panel.show').forEach(p=>{const id=p.id.replace('ssp-','');if(id!==exceptId){p.classList.remove('show');const wrap=$('ss-'+id);wrap?.querySelector('.ss-trigger')?.classList.remove('open')}})}
+function ssFilter(id,q){const list=$('ssl-'+id);if(!list)return;q=q.toLowerCase();const opts=list.querySelectorAll('.ss-opt');let vis=0;opts.forEach(o=>{const label=o.querySelector('.ss-ol')?.textContent?.toLowerCase()||'',extra=o.querySelector('.ss-oe')?.textContent?.toLowerCase()||'';const match=!q||label.includes(q)||extra.includes(q);o.style.display=match?'':'none';if(match)vis++});let nr=list.querySelector('.ss-nores');if(vis===0){if(!nr){nr=document.createElement('div');nr.className='ss-nores';nr.innerHTML='<i class="fas fa-search"></i>Tidak ditemukan';list.appendChild(nr)}nr.style.display=''}else if(nr)nr.style.display='none'}
+function ssKeyNav(e,id){if(e.key==='Escape'){ssCloseAll();e.preventDefault()}else if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();const list=$('ssl-'+id);if(!list)return;const vis=[...list.querySelectorAll('.ss-opt')].filter(o=>o.style.display!=='none');if(!vis.length)return;const cur=list.querySelector('.ss-opt.hover');if(cur)cur.classList.remove('hover');let idx=-1;if(cur)idx=vis.indexOf(cur);if(e.key==='ArrowDown')idx=Math.min(idx+1,vis.length-1);else idx=Math.max(idx-1,0);vis[idx]?.classList.add('hover');vis[idx]?.scrollIntoView({block:'nearest'})}else if(e.key==='Enter'){e.preventDefault();const hov=$('ssl-'+id)?.querySelector('.ss-opt.hover');if(hov)ssPick(id,hov.dataset.val)}}
+function ssPick(id,val){const wrap=$('ss-'+id),panel=$('ssp-'+id),list=$('ssl-'+id);if(!wrap||!panel||!list)return;list.querySelectorAll('.ss-opt').forEach(o=>{o.classList.toggle('active',o.dataset.val===val);o.classList.remove('hover')});const act=list.querySelector('.ss-opt.active'),disp=wrap.querySelector('.ss-display');if(act&&disp){disp.textContent=act.querySelector('.ss-ol')?.textContent||'';disp.classList.remove('ph')}else if(!val&&disp){disp.textContent='-- Pilih --';disp.classList.add('ph')}panel.classList.remove('show');wrap.querySelector('.ss-trigger')?.classList.remove('open');if(_ssCb[id])_ssCb[id](val)}
+function ssVal(id){return $('ssl-'+id)?.querySelector('.ss-opt.active')?.dataset.val||''}
+document.addEventListener('mousedown',e=>{if(!e.target.closest('.ss-wrap'))ssCloseAll()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')ssCloseAll()});
+window.addEventListener('scroll',()=>{document.querySelectorAll('.ss-panel.show').forEach(p=>ssPosition(p.id.replace('ssp-','')))},true);
+
+let dbP=1,dbPS=20,mP=1,mPS=20;
+function pagHTML(cp,total,ps,pv,uf){const tp=Math.ceil(total/ps);if(!total)return'';if(tp<=1)return'<div class="px-4 py-2 border-t border-cool-200 text-[11px] text-gray-400">Menampilkan '+total+' data</div>';const s2=(cp-1)*ps+1,e=Math.min(cp*ps,total);let h='<div class="px-4 py-2.5 border-t border-cool-200 flex flex-col sm:flex-row items-center justify-between gap-2"><span class="text-[11px] text-gray-400">Menampilkan '+s2+'–'+e+' dari '+total+'</span><div class="flex items-center gap-2"><select onchange="'+pv+'PS=Number(this.value);'+pv+'P=1;'+uf+'()" class="px-2 py-1 rounded-md border border-cool-200 text-[11px] bg-white cursor-pointer font-medium">';[20,30,50,100].forEach(v=>{h+='<option value="'+v+'"'+(v===ps?' selected':'')+'>'+v+' / hal</option>'});h+='</select><div class="flex items-center gap-0.5"><button class="pag-btn bg-cool-100 text-gray-500" onclick="'+pv+'P=1;'+uf+'()" '+(cp<=1?'disabled':'')+'><i class="fas fa-angle-double-left" style="font-size:9px"></i></button><button class="pag-btn bg-cool-100 text-gray-500" onclick="'+pv+'P='+(cp-1)+';'+uf+'()" '+(cp<=1?'disabled':'')+'><i class="fas fa-angle-left" style="font-size:9px"></i></button>';let sp=Math.max(1,cp-2),ep=Math.min(tp,sp+4);if(ep-sp<4)sp=Math.max(1,ep-4);if(sp>1)h+='<span class="pag-dots">…</span>';for(let p=sp;p<=ep;p++)h+=p===cp?'<button class="pag-btn active">'+p+'</button>':'<button class="pag-btn bg-cool-100 text-gray-600" onclick="'+pv+'P='+p+';'+uf+'()">'+p+'</button>';if(ep<tp)h+='<span class="pag-dots">…</span>';h+='<button class="pag-btn bg-cool-100 text-gray-500" onclick="'+pv+'P='+(cp+1)+';'+uf+'()" '+(cp>=tp?'disabled':'')+'><i class="fas fa-angle-right" style="font-size:9px"></i></button><button class="pag-btn bg-cool-100 text-gray-500" onclick="'+pv+'P='+tp+';'+uf+'()" '+(cp>=tp?'disabled':'')+'><i class="fas fa-angle-double-right" style="font-size:9px"></i></button>';h+='</div></div></div>';return h}
+
+let _selMitra=new Set(),_selMode=false;
+function toggleSelMode(){_selMode=!_selMode;if(!_selMode)_selMitra.clear();updMitraList();updFloatingBar()}
+function toggleSel(id,checked){if(checked)_selMitra.add(id);else _selMitra.delete(id);const row=document.querySelector('[data-mid="'+id+'"]');if(row)row.classList.toggle('row-sel',checked);updSelHeader();updFloatingBar()}
+function selAllVisible(){const el=$('mitraListWrap');if(!el)return;el.querySelectorAll('input[data-mid-cb]').forEach(cb=>{_selMitra.add(cb.dataset.midCb);cb.checked=true;const row=cb.closest('tr');if(row)row.classList.add('row-sel')});updSelHeader();updFloatingBar()}
+function deselAll(){_selMitra.clear();const el=$('mitraListWrap');if(el)el.querySelectorAll('input[data-mid-cb]').forEach(cb=>{cb.checked=false;const row=cb.closest('tr');if(row)row.classList.remove('row-sel')});updSelHeader();updFloatingBar()}
+function updSelHeader(){const hdr=$('selHdrCb');if(!hdr)return;const el=$('mitraListWrap');const all=el?el.querySelectorAll('input[data-mid-cb]').length:0;const checked=el?el.querySelectorAll('input[data-mid-cb]:checked').length:0;hdr.checked=all>0&&all===checked;hdr.indeterminate=checked>0&&checked<all}
+function updFloatingBar(){const bar=$('floatingBar'),count=$('fbCount');if(!bar||!count)return;count.textContent=_selMitra.size;bar.classList.toggle('show',_selMitra.size>0)}
+function printMultiple(){const ids=[..._selMitra];if(!ids.length)return toast('Pilih mitra terlebih dahulu','warning');const mitras=ids.map(id=>S.mitra.find(m=>m.id===id)).filter(Boolean);if(!mitras.length)return;const bodies=mitras.map((m,i)=>{let b=_contractBody(m);if(i<mitras.length-1)b+='<div class="print-page-sep"></div>';return b}).join('\n');const lbl=esc(mitras[0].nama)+(mitras.length>1?' + '+(mitras.length-1)+' lainnya':'');const html='<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Cetak '+mitras.length+' Kontrak</title>'+_printCSS(true)+'</head><body>'+_printToolbar(lbl,esc(mitras.length+' kontrak'),'Cetak '+mitras.length+' Dokumen')+bodies+'</body></html>';try{const blob=new Blob([html],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);window.open(url,'_blank','width=960,height=800')}catch(e){toast('Gagal: '+e.message,'error')}}
+
+function rDash(){const tot=S.mitra.length,pclC=S.mitra.filter(m=>m.jenisPetugas==='PCL').length,ubC=S.mitra.filter(m=>m.jenisPetugas==='PCL_UB').length;const totalHonor=S.mitra.reduce((s,m)=>s+(m.totalHonor||0),0),dups=findDuplicates();const dbAktif=S.dbMitra.filter(m=>m.aktif!==false).length;const hasDb=!!S.dbMitra.length,hasKon=!!S.mitra.length,hasPpk=!!S.set.ppkNama;
+if(!hasPpk&&!hasKon){return'<div class="fade-in"><div class="empty-hero p-8 sm:p-12 lg:p-16 text-center relative"><div class="relative z-10"><div class="hero-logo-ring mx-auto mb-6"><img src="https://z-cdn-media.chatglm.cn/files/b8bffa74-ccd7-43df-ac0a-7d38232e3901.png?auth_key=1872868863-b6cd966dc51a4c34aa738032b487a895-0-e6beed34fb7fb9a9650976366f590c26" alt="Logo BPS"></div><h2 class="text-white text-2xl sm:text-3xl font-bold tracking-wide mb-1">BADAN PUSAT STATISTIK</h2><p class="text-blue-300/70 text-sm sm:text-base font-medium tracking-widest uppercase mb-2">Kota Pekanbaru</p><p class="text-gold-400/60 text-xs italic mb-8">Sensus Ekonomi 2026</p><div class="w-16 h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent mx-auto mb-8"></div><h3 class="text-white/90 text-lg font-semibold mb-2">Selamat Datang</h3><p class="text-blue-200/50 text-sm mb-6 max-w-md mx-auto">Sistem manajemen kontrak Petugas Pendataan Lapangan SE2026 BPS Kota Pekanbaru.</p><div class="max-w-sm mx-auto space-y-3 text-left mb-8"><div class="qs-step '+(hasDb?'done':'pending')+'" onclick="nav(\'dbmitra\')"><div class="qs-num">'+(hasDb?'<i class="fas fa-check"></i>':'1')+'</div><div class="qs-text"><div class="qs-title">Database Mitra</div><div class="qs-desc">'+(hasDb?S.dbMitra.length+' petugas terdaftar':'Kelola data petugas pendataan')+'</div></div><span class="qs-icon">'+(hasDb?'<i class="fas fa-check-circle text-green-500"></i>':'<span class="qs-arrow"><i class="fas fa-arrow-right"></i></span>')+'</span></div><div class="qs-step '+(hasPpk?'done':'pending')+'" onclick="nav(\'settings\')"><div class="qs-num">'+(hasPpk?'<i class="fas fa-check"></i>':'2')+'</div><div class="qs-text"><div class="qs-title">Pengaturan PPK</div><div class="qs-desc">'+(hasPpk?esc(S.set.ppkNama):'Isi data PPK dan BPS')+'</div></div><span class="qs-icon">'+(hasPpk?'<i class="fas fa-check-circle text-green-500"></i>':'<span class="qs-arrow"><i class="fas fa-arrow-right"></i></span>')+'</span></div><div class="qs-step '+(hasKon?'done':'pending')+'" onclick="nav(\'mitra\')"><div class="qs-num">'+(hasKon?'<i class="fas fa-check"></i>':'3')+'</div><div class="qs-text"><div class="qs-title">Buat Kontrak SE2026</div><div class="qs-desc">'+(hasKon?S.mitra.length+' kontrak dibuat':'Mulai buat kontrak PCL')+'</div></div><span class="qs-icon">'+(hasKon?'<i class="fas fa-check-circle text-green-500"></i>':'<span class="qs-arrow"><i class="fas fa-arrow-right"></i></span>')+'</span></div></div><div class="flex gap-3 justify-center flex-wrap"><button onclick="nav(\'settings\')" class="btn-p px-6 py-3 rounded-xl text-sm font-semibold"><i class="fas fa-cog mr-2"></i>Mulai dari Pengaturan</button><button onclick="loadSample()" class="btn-g px-6 py-3 rounded-xl text-sm font-medium"><i class="fas fa-database mr-2"></i>Muat Data Contoh</button></div></div></div></div>'}
+const dist=getMonthDist();const maxC=Math.max(1,...dist.map(d=>d.count));const chartHTML=dist.map(d=>{const pct=Math.round(d.count/maxC*100);const hasData=d.count>0;return'<div class="flex items-center gap-3"><span class="text-[11px] text-gray-500 w-16 text-right font-medium shrink-0">'+BL[d.bulan].substring(0,3)+'</span><div class="flex-1 bg-cool-100 rounded-lg h-7 overflow-hidden relative"><div class="dist-bar '+(hasData?'bg-gradient-to-r from-blue-500 to-blue-400':'bg-cool-200')+'" style="width:'+Math.max(pct,hasData?8:0)+'%">'+(hasData?'<span class="dist-tip">'+d.count+'</span>':'')+'</div></div><span class="text-[11px] font-mono '+(hasData?'text-navy-700 font-bold':'text-gray-300')+' w-6 text-center shrink-0">'+(d.count||'-')+'</span></div>'}).join('');
+return'<div class="fade-in"><div class="hero-bg rounded-b-3xl px-4 sm:px-8 lg:px-10 pt-8 pb-16 mb-[-48px] relative z-10"><div class="hero-glow"></div><div class="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-10"><div class="hero-logo-ring shrink-0"><img src="https://z-cdn-media.chatglm.cn/files/b8bffa74-ccd7-43df-ac0a-7d38232e3901.png?auth_key=1872868863-b6cd966dc51a4c34aa738032b487a895-0-e6beed34fb7fb9a9650976366f590c26" alt="Logo BPS"></div><div class="text-center lg:text-left"><h2 class="text-white text-xl sm:text-2xl lg:text-3xl font-bold tracking-wide leading-tight">BADAN PUSAT STATISTIK</h2><p class="text-blue-300/70 text-sm sm:text-base font-semibold tracking-[0.2em] uppercase mt-0.5">Kota Pekanbaru</p><p class="text-gold-400/70 text-xs italic mt-1.5">Sensus Ekonomi 2026</p></div><div class="lg:ml-auto hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5"><div class="pulse-dot" style="background:#3b82f6"></div><span class="text-blue-200/60 text-xs">Sistem Kontrak PCL SE2026</span></div></div><div class="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-8"><div class="glass p-4"><div class="g-icon bg-blue-500/20 text-blue-300 mb-3"><i class="fas fa-address-book"></i></div><p class="stat-num text-white">'+S.dbMitra.length+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">DB Mitra</p><p class="text-emerald-300/60 text-[9px] mt-0.5">'+dbAktif+' aktif</p></div><div class="glass p-4"><div class="g-icon bg-gold-500/20 text-gold-300 mb-3"><i class="fas fa-file-contract"></i></div><p class="stat-num text-white">'+tot+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">Kontrak</p></div><div class="glass p-4"><div class="g-icon bg-sky-500/20 text-sky-300 mb-3"><i class="fas fa-walking"></i></div><p class="stat-num text-white">'+pclC+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">PCL</p></div><div class="glass p-4"><div class="g-icon bg-amber-500/20 text-amber-300 mb-3"><i class="fas fa-building"></i></div><p class="stat-num text-white">'+ubC+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">PCL UB</p></div><div class="glass p-4"><div class="g-icon bg-emerald-500/20 text-emerald-300 mb-3"><i class="fas fa-money-bill-wave"></i></div><p class="stat-num text-white text-base lg:text-lg">'+fRp(totalHonor)+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">Total Honor</p></div><div class="glass p-4"><div class="g-icon '+(dups.length?'bg-red-500/20 text-red-300':'bg-violet-500/20 text-violet-300')+' mb-3"><i class="fas '+(dups.length?'fa-exclamation-triangle':'fa-calendar-check')+'"></i></div><p class="stat-num text-white">'+dups.length+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">'+(dups.length?'Duplikat!':'OK')+'</p></div></div><div class="hero-wave"><svg viewBox="0 0 1440 36" preserveAspectRatio="none"><path d="M0,18 C240,36 480,0 720,18 C960,36 1200,0 1440,18 L1440,36 L0,36 Z" fill="#f0f4f8"/></svg></div></div><div class="relative z-20 px-0"><div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6"><div class="lg:col-span-3 bg-white rounded-2xl border border-cool-200 shadow-sm"><div class="px-5 py-3 border-b border-cool-200"><h3 class="font-semibold text-sm flex items-center gap-2"><i class="fas fa-chart-bar text-blue-500 text-xs"></i>Distribusi Kontrak per Bulan</h3></div><div class="p-5 space-y-2">'+chartHTML+'</div></div><div class="lg:col-span-2 space-y-6"><div class="bg-white rounded-2xl border border-cool-200 shadow-sm"><div class="px-5 py-3 border-b border-cool-200"><h3 class="font-semibold text-sm flex items-center gap-2"><i class="fas fa-user-tie text-gold-600 text-xs"></i>PPK</h3></div><div class="p-5">'+(S.set.ppkNama?'<p class="font-semibold text-sm">'+esc(S.set.ppkNama)+'</p><p class="text-xs text-gray-400 font-mono mt-1">'+esc(S.set.ppkNip||'-')+'</p><p class="text-xs text-gray-500 mt-2">'+esc(S.set.bpsNama)+'</p>':'<p class="text-sm text-gray-400 italic">Belum dikonfigurasi</p><button onclick="nav(\'settings\')" class="text-gold-600 text-xs font-medium hover:underline mt-2 inline-block"><i class="fas fa-cog mr-1"></i>Buka Pengaturan</button>')+'</div></div><div class="bg-gradient-to-br from-navy-900 to-navy-800 rounded-2xl p-5 text-white relative overflow:hidden"><div class="absolute inset-0" style="background-image:radial-gradient(circle,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:18px 18px"></div><div class="relative z-10"><p class="text-blue-300/60 text-[10px] uppercase tracking-widest font-semibold mb-2">Periode SE2026</p><p class="text-2xl font-bold">Juni – Agustus 2026</p><div class="mt-3 flex gap-4 text-xs"><div><span class="text-blue-300/40 block">TTD Default</span><span class="text-blue-200 font-medium">'+fTglShort(S.set.tglTandaTangan||'')+'</span></div><div><span class="text-blue-300/40 block">Selesai</span><span class="text-blue-200 font-medium">'+fTglShort(S.set.tglSelesai||'')+'</span></div></div><div class="mt-3 text-xs"><span class="text-blue-300/40 block">Honor Maks</span><span class="text-gold-400 font-semibold">'+fRp(S.set.honorMaks)+'</span></div></div></div></div></div></div></div>'}
+function getMonthDist(){const dist=[];for(let i=0;i<12;i++)dist.push({bulan:i,count:0});S.mitra.forEach(m=>{const t=getMitraTglTT(m);if(t){const d=new Date(t);dist[d.getMonth()].count++}});return dist}
+
+let dbSearch='',dbStatus='all';
+function rDbMitra(){const aktifC=S.dbMitra.filter(m=>m.aktif!==false).length,nonaktifC=S.dbMitra.filter(m=>m.aktif===false).length;return'<div class="fade-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5"><div><h2 class="text-2xl font-bold">Database Mitra</h2><p class="text-gray-500 text-sm mt-1">'+S.dbMitra.length+' mitra · <span class="text-green-600 font-medium">'+aktifC+' aktif</span> · <span class="text-slate-500 font-medium">'+nonaktifC+' nonaktif</span></p></div><button onclick="oMFormDb()" class="btn-p px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap"><i class="fas fa-plus mr-2"></i>Tambah Mitra</button></div><div class="bg-white rounded-2xl border border-cool-200 shadow-sm"><div class="px-4 py-2 border-b border-cool-200"><div class="flex flex-col sm:flex-row gap-2"><div class="relative flex-1"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input type="text" placeholder="Cari nama, NIK..." value="'+esc(dbSearch)+'" oninput="dbSearch=this.value;dbP=1;updDbList()" class="w-full pl-8 pr-3 py-2 rounded-lg border border-cool-200 text-sm"></div><div class="flex gap-1.5 flex-shrink-0 items-center"><span class="text-[10px] text-gray-400 font-medium uppercase tracking-wider mr-0.5">Status:</span>'+['all','aktif','nonaktif'].map(f=>{const lb={all:'Semua',aktif:'Aktif',nonaktif:'Nonaktif'};return'<button data-dbfilter="'+f+'" onclick="dbStatus=\''+f+'\';dbP=1;updDbList()" class="px-2.5 py-1.5 rounded-md text-xs font-medium transition '+(dbStatus===f?'bg-navy-900 text-white':'bg-cool-100 text-gray-600 hover:bg-cool-200')+'">'+lb[f]+'</button>'}).join('')+'</div></div></div><div id="dbListWrap"></div></div></div>'}
+function updDbList(){const el=$('dbListWrap');if(!el)return;let list=[...S.dbMitra];if(dbStatus==='aktif')list=list.filter(m=>m.aktif!==false);if(dbStatus==='nonaktif')list=list.filter(m=>m.aktif===false);if(dbSearch){const q=dbSearch.toLowerCase();list=list.filter(m=>m.nama.toLowerCase().includes(q)||m.nik.includes(q)||(m.noHp||'').includes(q))}list.sort((a,b)=>(a.nama||'').localeCompare(b.nama||''));const tf=list.length;if(!tf){el.innerHTML='<div class="px-6 py-16 text-center text-gray-400"><i class="fas fa-address-book text-3xl mb-3 block"></i>'+(dbSearch||dbStatus!=='all'?'Tidak ditemukan':'Database kosong')+'</div>';return}const st=(dbP-1)*dbPS,en=Math.min(dbP*dbPS,tf),pi=list.slice(st,en);el.innerHTML='<div class="tbl-scroll"><table class="w-full ctbl ctbl-compact"><thead><tr class="text-center"><th class="w-7">No</th><th>Nama</th><th>NIK</th><th>No. HP</th><th>Alamat</th><th class="text-center" style="width:130px">Status</th><th class="text-right w-20">Aksi</th></tr></thead><tbody>'+pi.map((m,i)=>{const a=m.aktif!==false;return'<tr class="tbl-row border-b border-cool-100 last:border-0 '+(!a?'opacity-60':'')+'"><td class="text-[10px]">'+(st+i+1)+'</td><td class="font-medium">'+esc(m.nama)+'</td><td class="font-mono text-[10.5px]">'+esc(m.nik)+'</td><td class="text-[10.5px]">'+esc(m.noHp||'-')+'</td><td class="text-[10.5px] text-gray-500">'+esc(m.alamat)+'</td><td class="text-center st-cell"><div class="flex items-center justify-center gap-1.5"><label class="toggle-switch"><input type="checkbox" '+(a?'checked':'')+' onchange="toggleDbAktif(\''+m.id+'\')"><span class="toggle-slider"></span></label><span class="'+(a?'status-aktif':'status-nonaktif')+'"><i class="fas '+(a?'fa-check-circle':'fa-times-circle')+'"></i>'+(a?'Aktif':'Nonaktif')+'</span></div></td><td class="text-right whitespace-nowrap"><button onclick="oMFormDb(\''+m.id+'\')" class="text-amber-400 hover:text-amber-500 text-[11px] font-medium mr-1"><i class="fas fa-pen"></i></button><button onclick="delDb(\''+m.id+'\')" class="text-red-400 hover:text-red-500 text-[11px] font-medium"><i class="fas fa-trash"></i></button></td></tr>'}).join('')+'</tbody></table></div>'+pagHTML(dbP,tf,dbPS,'db','updDbList');document.querySelectorAll('[data-dbfilter]').forEach(btn=>{btn.className='px-2.5 py-1.5 rounded-md text-xs font-medium transition '+(btn.dataset.dbfilter===dbStatus?'bg-navy-900 text-white':'bg-cool-100 text-gray-600 hover:bg-cool-200')})}
+function toggleDbAktif(id){const m=S.dbMitra.find(x=>x.id===id);if(!m)return;m.aktif=m.aktif===false?true:false;aSave();updDbList();toast(m.aktif?'Diaktifkan':'Dinonaktifkan',m.aktif?'success':'warning')}
+function oMFormDb(editId){const m=editId?S.dbMitra.find(x=>x.id===editId):{id:'',nama:'',nik:'',noHp:'',alamat:'',aktif:true};if(!m&&editId)return;const isEdit=!!editId;oM((isEdit?'Edit':'Tambah')+' Database Mitra','<div class="fade-in max-w-3xl mx-auto space-y-5"><div class="bg-cool-50 rounded-xl p-5 space-y-4"><h4 class="font-semibold text-sm text-gold-700 flex items-center gap-2"><i class="fas fa-user"></i> '+(isEdit?'Edit':'Tambah')+' Data Mitra</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Nama Lengkap <span class="text-red-400">*</span></label><input id="fDbNm" type="text" value="'+esc(m.nama)+'" placeholder="Ketik nama lengkap..." class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">NIK <span class="text-red-400">*</span></label><input id="fDbNik" type="text" value="'+esc(m.nik)+'" maxlength="16" placeholder="16 digit NIK" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm font-mono"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">No. HP</label><input id="fDbHp" type="text" value="'+esc(m.noHp||'')+'" placeholder="08xxx" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Alamat <span class="text-red-400">*</span></label><textarea id="fDbAl" rows="2" placeholder="Ketik alamat..." class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm resize-none">'+esc(m.alamat)+'</textarea></div><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-2">Status</label><div class="flex items-center gap-3"><label class="toggle-switch"><input id="fDbAktif" type="checkbox" '+(m.aktif!==false?'checked':'')+'><span class="toggle-slider"></span></label><span class="text-sm '+(m.aktif!==false?'text-green-600':'text-slate-500')+' font-medium">'+(m.aktif!==false?'Aktif':'Nonaktif')+'</span></div></div></div></div><div class="flex flex-col sm:flex-row justify-between gap-3 pt-2 border-t border-cool-200"><button onclick="cM()" class="btn-g px-5 py-2.5 rounded-xl text-sm font-medium">Batal</button><button onclick="saveDbMitra(\''+(editId||'')+'\')" class="btn-p px-6 py-2.5 rounded-xl text-sm font-semibold"><i class="fas fa-save mr-2"></i>'+(isEdit?'Simpan Perubahan':'Simpan Mitra')+'</button></div></div>',false,'')}
+function saveDbMitra(editId){const nama=$('fDbNm').value.trim(),nik=$('fDbNik').value.trim(),hp=$('fDbHp').value.trim(),alamat=$('fDbAl').value.trim(),aktif=$('fDbAktif').checked;if(!nama)return toast('Nama wajib diisi','warning');if(!nik||nik.length<10)return toast('NIK tidak valid','warning');if(!alamat)return toast('Alamat wajib diisi','warning');if(editId){const idx=S.dbMitra.findIndex(x=>x.id===editId);if(idx>-1)S.dbMitra[idx]={...S.dbMitra[idx],nama,nik,noHp:hp,alamat,aktif,updatedAt:new Date().toISOString()};toast('Data mitra diperbarui')}else{S.dbMitra.push({id:gid(),nama,nik,noHp:hp,alamat,aktif,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});toast('Mitra berhasil ditambahkan')}aSave();cM();render()}
+function delDb(id){const m=S.dbMitra.find(x=>x.id===id);if(!m)return;oCf('Hapus Database Mitra','"'+m.nama+'" ('+m.nik+') akan dihapus.',()=>{S.dbMitra=S.dbMitra.filter(x=>x.id!==id);aSave();render();toast('Database mitra berhasil dihapus')})}
+
+let mSearch='',mFilter='all',mFilterJenis='all';
+function rMitra(){const dups=findDuplicates();return'<div class="fade-in"><div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5"><div><h2 class="text-2xl font-bold">Kontrak PCL SE2026</h2><p class="text-gray-500 text-sm mt-1">'+S.mitra.length+' kontrak'+(dups.length?' · <span class="text-red-600 font-semibold"><i class="fas fa-exclamation-triangle mr-1"></i>'+dups.length+' duplikat</span>':'')+'</p></div><div class="flex gap-2 flex-wrap"><button onclick="addSingle()" class="btn-p px-5 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap"><i class="fas fa-plus mr-2"></i>Tambah Kontrak</button><button id="selToggleBtn" onclick="toggleSelMode()" class="sel-toggle-btn '+(_selMode?'active':'')+'"><i class="fas '+(_selMode?'fa-check-double':'fa-check-square')+'"></i><span>'+(_selMode?'Keluar Mode Pilih':'Pilih untuk Cetak')+'</span></button></div></div>'+(dups.length?'<div class="dup-warn-bar mb-4"><i class="fas fa-exclamation-triangle"></i><div><strong>'+dups.length+' nomor duplikat:</strong> '+dups.map(d=>'<span class="font-mono font-bold">'+d.nomor+'</span> ('+esc(d.duplicate.nama)+')').join(', ')+' — <button onclick="fixDuplicates();aSave();render();toast(\'Duplikat diperbaiki\')" class="underline font-semibold hover:no-underline">Perbaiki</button></div></div>':'')+'<div class="bg-white rounded-2xl border border-cool-200 shadow-sm"><div class="px-4 py-2 border-b border-cool-200 space-y-2"><div class="flex flex-col sm:flex-row gap-2"><div class="relative flex-1"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i><input type="text" placeholder="Cari nama, NIK, nomor..." value="'+esc(mSearch)+'" oninput="mSearch=this.value;mP=1;updMitraList()" class="w-full pl-8 pr-3 py-2 rounded-lg border border-cool-200 text-sm"></div><div class="flex gap-2 flex-shrink-0">'+['all','PCL','PCL_UB'].map(f=>{const lb={all:'Semua',PCL:'PCL',PCL_UB:'PCL UB'};return'<button data-mfilter-jenis="'+f+'" onclick="mFilterJenis=\''+f+'\';mP=1;updMitraList()" class="px-2.5 py-1.5 rounded-lg text-xs font-medium transition '+(mFilterJenis===f?'flt-active':'bg-cool-100 text-gray-600 hover:bg-cool-200')+'">'+lb[f]+'</button>'}).join('')+'</div></div><div class="flex gap-1.5 flex-wrap items-center"><span class="text-[10px] text-gray-400 font-medium uppercase tracking-wider mr-0.5">Filter:</span>'+['all','custom'].map(f=>{const lb={all:'Semua',custom:'Tgl Custom'};return'<button data-mfilter="'+f+'" onclick="mFilter=\''+f+'\';mP=1;updMitraList()" class="px-2.5 py-1.5 rounded-md text-xs font-medium transition '+(mFilter===f?'bg-navy-900 text-white':'bg-cool-100 text-gray-600 hover:bg-cool-200')+'">'+lb[f]+'</button>'}).join('')+'</div></div><div id="mitraListWrap"></div></div></div>'}
+function updMitraList(){const el=$('mitraListWrap');if(!el)return;const dupSet=new Set(findDuplicates().map(d=>d.nomor));let list=[...S.mitra];if(mFilterJenis!=='all')list=list.filter(m=>m.jenisPetugas===mFilterJenis);if(mFilter==='custom')list=list.filter(m=>m.tglTandaTangan);if(mSearch){const q=mSearch.toLowerCase();list=list.filter(m=>m.nama.toLowerCase().includes(q)||m.nik.includes(q)||m.nomorKontrak.toLowerCase().includes(q))}list.sort((a,b)=>(b.nomorKontrak||'').localeCompare(a.nomorKontrak||''));const tf=list.length;if(!tf){el.innerHTML='<div class="px-6 py-16 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-3 block"></i>Belum ada kontrak.</div>';return}const st=(mP-1)*mPS,en=Math.min(mP*mPS,tf),pi=list.slice(st,en);const cbCol=_selMode?'<th class="w-9 text-center" style="padding:9px 4px"><input type="checkbox" id="selHdrCb" onchange="this.checked?selAllVisible():deselAll()" class="sel-cb"></th>':'';const selQ=_selMode&&!_selMitra.size?'<div class="px-4 py-1.5 bg-blue-50 border-b border-blue-100 text-[11px] text-blue-700 flex items-center gap-2"><i class="fas fa-info-circle"></i>Centang yang ingin dicetak, atau <button onclick="selAllVisible()" class="underline font-semibold hover:no-underline">pilih semua ('+tf+')</button></div>':'';el.innerHTML=selQ+'<div class="tbl-scroll"><table class="w-full ctbl"><thead><tr class="text-center">'+cbCol+'<th class="w-7">No</th><th style="width:185px">Nomor</th><th>Nama</th><th class="text-center">Jenis</th><th class="text-center">TTD</th><th class="text-center">Honor</th><th class="text-center w-28">Aksi</th></tr></thead><tbody>'+pi.map((m,i)=>{const isDup=dupSet.has(m.nomorKontrak),isSel=_selMitra.has(m.id);const cbTd=_selMode?'<td class="text-center" style="padding:2px 4px"><input type="checkbox" data-mid-cb="'+m.id+'" '+(isSel?'checked':'')+' onchange="toggleSel(\''+m.id+'\',this.checked)" class="sel-cb"></td>':'';const jC=m.jenisPetugas==='PCL_UB'?'<span class="jenis-chip pcl-ub"><i class="fas fa-building" style="font-size:7px"></i>PCL UB</span>':'<span class="jenis-chip pcl"><i class="fas fa-walking" style="font-size:7px"></i>PCL</span>';return'<tr class="tbl-row border-b border-cool-100 last:border-0 '+(isDup?'bg-red-50/50':'')+' '+(isSel?'row-sel':'')+'" data-mid="'+m.id+'">'+cbTd+'<td class="text-[11px]">'+(st+i+1)+'</td><td>'+formatNomorBadge(m.nomorKontrak,isDup)+'</td><td class="font-medium">'+esc(m.nama)+'</td><td class="text-center">'+jC+'</td><td class="text-center">'+(m.tglTandaTangan?'<span class="date-badge custom"><i class="fas fa-lock" style="font-size:7px"></i>'+fTglShort(m.tglTandaTangan)+'</span>':'<span class="date-badge global">'+fTglShort(S.set.tglTandaTangan||'')+'</span>')+'</td><td class="font-mono text-[11px] text-right">'+Number(m.totalHonor||0).toLocaleString('id-ID')+'</td><td class="text-right whitespace-nowrap"><button onclick="viewM(\''+m.id+'\')" class="text-blue-500 hover:text-blue-600 text-xs font-medium mr-1"><i class="fas fa-eye"></i></button><button onclick="editM(\''+m.id+'\')" class="text-amber-400 hover:text-amber-500 text-xs font-medium mr-1"><i class="fas fa-pen"></i></button><button onclick="printK(\''+m.id+'\')" class="text-blue-500 hover:text-blue-600 text-xs font-medium mr-1"><i class="fas fa-print"></i></button><button onclick="delM(\''+m.id+'\')" class="text-red-400 hover:text-red-500 text-xs font-medium"><i class="fas fa-trash"></i></button></td></tr>'}).join('')+'</tbody></table></div>'+pagHTML(mP,tf,mPS,'m','updMitraList');document.querySelectorAll('[data-mfilter]').forEach(btn=>{btn.className='px-2.5 py-1.5 rounded-md text-xs font-medium transition '+(btn.dataset.mfilter===mFilter?'bg-navy-900 text-white':'bg-cool-100 text-gray-600 hover:bg-cool-200')});document.querySelectorAll('[data-mfilter-jenis]').forEach(btn=>{btn.className='px-2.5 py-1.5 rounded-lg text-xs font-medium transition '+(btn.dataset.mfilterJenis===mFilterJenis?'flt-active':'bg-cool-100 text-gray-600 hover:bg-cool-200')});const stb=$('selToggleBtn');if(stb)stb.className='sel-toggle-btn '+(_selMode?'active':'');setTimeout(updSelHeader,0);updFloatingBar()}
+
+function viewM(id){const m=S.mitra.find(x=>x.id===id);if(!m)return;const isDup=findDuplicates().some(d=>d.nomor===m.nomorKontrak);const jC=m.jenisPetugas==='PCL_UB'?'<span class="jenis-chip pcl-ub"><i class="fas fa-building" style="font-size:7px"></i>PCL UB</span>':'<span class="jenis-chip pcl"><i class="fas fa-walking" style="font-size:7px"></i>PCL</span>';const safeId=esc(m.id).replace(/'/g,"\\'");const nt1=m.nilaiTermin1||0,nt2=m.nilaiTermin2||0,ntSum=nt1+nt2;const matchCls=ntSum>0?(ntSum===m.totalHonor?'ok':'mismatch'):'neutral';const matchLbl=ntSum>0?(ntSum===m.totalHonor?'<i class="fas fa-check-circle" style="font-size:9px"></i> Cocok':'<i class="fas fa-exclamation-triangle" style="font-size:9px"></i> Tidak cocok'):'<i class="fas fa-minus-circle" style="font-size:9px"></i> Belum diisi';
+oM('Detail: '+esc(m.nama),'<div class="space-y-5"><div class="nomor-auto"><div><div class="label">Nomor Kontrak</div><div>'+esc(m.nomorKontrak)+'</div></div><i class="fas fa-check-circle"></i></div>'+(isDup?'<div class="dup-warn-bar"><i class="fas fa-exclamation-triangle"></i><span><b>Duplikat!</b></span></div>':'')+'<div class="bg-cool-50 rounded-xl p-5 space-y-3"><h4 class="font-semibold text-sm text-gold-700 flex items-center gap-2"><i class="fas fa-user"></i> Data Pribadi</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"><div><span class="text-gray-400 text-xs block">NIK</span><span class="font-mono text-xs">'+esc(m.nik)+'</span></div><div><span class="text-gray-400 text-xs block">Telepon</span><span class="text-xs">'+esc(m.noTelepon||'-')+'</span></div><div class="md:col-span-2"><span class="text-gray-400 text-xs block">Alamat</span><span class="text-xs">'+esc(m.alamat)+'</span></div><div><span class="text-gray-400 text-xs block">Jenis</span>'+jC+'</div><div><span class="text-gray-400 text-xs block">TTD</span><span class="date-badge '+(m.tglTandaTangan?'custom':'global')+'">'+fTglShort(m.tglTandaTangan||S.set.tglTandaTangan||'-')+'</span></div><div><span class="text-gray-400 text-xs block">Selesai</span><span class="date-badge '+(m.tglSelesai?'custom':'global')+'">'+fTglShort(m.tglSelesai||S.set.tglSelesai||'-')+'</span></div></div></div><div class="bg-blue-50 rounded-xl p-5 space-y-3"><h4 class="font-semibold text-sm text-blue-700 flex items-center gap-2"><i class="fas fa-money-bill-wave"></i> Honorarium & Sanksi</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm"><div><span class="text-gray-400 text-xs block">Total Honorarium</span><span class="font-mono font-bold text-gold-600">'+fRp(m.totalHonor||0)+'</span><span class="block text-[10px] text-gray-400 font-mono mt-0.5">('+terbilang(m.totalHonor||0)+' rupiah)</span></div><div><span class="text-gray-400 text-xs block">Sanksi Pelatihan</span><span class="font-mono text-red-600">'+fRp(m.sanksiPelatihan||0)+'</span><span class="block text-[10px] text-gray-400 font-mono mt-0.5">('+terbilang(m.sanksiPelatihan||0)+' rupiah)</span></div></div></div><div class="bg-orange-50 rounded-xl p-5 space-y-3"><h4 class="font-semibold text-sm text-orange-700 flex items-center gap-2"><i class="fas fa-table"></i> Nilai Lampiran (Termin I + II)</h4><div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm"><div><span class="text-gray-400 text-xs block">Nilai Termin I</span><span class="font-mono font-semibold '+(nt1?'text-navy-700':'text-gray-400')+'">'+fRp(nt1)+'</span></div><div><span class="text-gray-400 text-xs block">Nilai Termin II</span><span class="font-mono font-semibold '+(nt2?'text-navy-700':'text-gray-400')+'">'+fRp(nt2)+'</span></div><div><span class="text-gray-400 text-xs block">Total Lampiran</span><span class="font-mono font-bold '+(ntSum?'text-navy-700':'text-gray-400')+'">'+fRp(ntSum)+'</span></div></div><div class="flex items-center gap-2 mt-1"><span class="nilai-match '+matchCls+'">'+matchLbl+'</span><span class="text-[10px] text-gray-400">vs Total Honor '+fRp(m.totalHonor||0)+'</span></div></div><div class="flex gap-3 justify-end pt-3 border-t border-cool-200"><button onclick="editM(\''+safeId+'\')" class="btn-g px-5 py-2.5 rounded-xl text-sm font-medium"><i class="fas fa-pen mr-2"></i>Edit</button></div></div>',true,id)}
+
+let _editId='';
+function addSingle(){if(!S.set.ppkNama)return toast('Isi pengaturan PPK/BPS dulu','warning');_editId='';oM('<i class="fas fa-plus-circle text-gold-500 mr-2"></i>Tambah Kontrak SE2026',mitraFormHTML({id:'',nama:'',nik:'',alamat:'',noTelepon:'',tglTandaTangan:'',tglSelesai:'',jenisPetugas:'PCL',totalHonor:0,sanksiPelatihan:0,nilaiTermin1:0,nilaiTermin2:0},false),false,'');setTimeout(()=>{ssInit('ss-mitra-nm',handleNamaSelect);ssInit('ss-jenis-petugas',handleJenisSelect);updTglPreview()},60)}
+function findDbMitraByNama(nama){if(!nama)return null;return S.dbMitra.find(d=>d.nama.toLowerCase()===nama.toLowerCase()&&d.aktif!==false)||null}
+function mitraFormHTML(m,isEdit){const dbMatch=findDbMitraByNama(m.nama);const aktifDb=[...S.dbMitra.filter(d=>d.aktif!==false)].sort((a,b)=>(a.nama||'').localeCompare(b.nama||''));let namaOpts=[],namaShowManual=false,namaManualVal='',selVal='';if(aktifDb.length){aktifDb.forEach(d=>{if(dbMatch&&d.id===dbMatch.id)selVal=d.id;namaOpts.push({value:d.id,label:d.nama,extra:d.nik})});namaOpts.push({value:'__manual__',label:'✏️ Input Manual',special:true});if(!dbMatch&&m.nama){selVal='__manual__';namaShowManual=true;namaManualVal=m.nama}}else{namaOpts=[{value:'__manual__',label:'✏️ Input Manual (DB Kosong)',special:true}];selVal='__manual__';namaShowManual=true;namaManualVal=m.nama}
+const isLocked=!!isEdit&&m.nomorKontrak;let nkHTML='';if(isLocked)nkHTML='<div class="nk-compact locked" id="fNKPreview"><span class="nk-label"><i class="fas fa-lock" style="font-size:8px;margin-right:2px"></i>Nomor (Tetap)</span><span id="fNKText">'+esc(m.nomorKontrak)+'</span><i class="fas fa-lock" style="color:#64748b"></i></div><div id="fNKDupWarn" style="display:none"></div>';else nkHTML='<div class="nk-compact" id="fNKPreview"><span class="nk-label">Nomor Kontrak</span><span id="fNKText">'+getNomorPreview(m.tglTandaTangan||S.set.tglTandaTangan||'','').nomor+'</span><i class="fas fa-check-circle"></i></div><div id="fNKDupWarn" style="display:none"></div>';
+const jenisOpts=[{value:'PCL',label:'PCL — Door to Door',extra:'Pendataan Lapangan'},{value:'PCL_UB',label:'PCL UB — Usaha Besar',extra:'Pendataan Usaha Besar'}];
+return'<div class="space-y-3 fade-in">'+nkHTML+'<div class="f-section"><div class="f-section-hd"><i class="fas fa-user shd-gold"></i>Data Pribadi Mitra</div><div class="f-section-bd"><div class="f-row f-row-3" style="margin-bottom:8px"><div class="fg" style="grid-column:1/-1"><label class="fg-label">Nama Lengkap<span class="req">*</span></label>'+ssHTML('ss-mitra-nm',namaOpts,selVal,'Cari nama mitra...')+'<input id="fNmManual" type="text" value="'+esc(namaManualVal)+'" class="fg-input '+(namaShowManual?'':'hidden')+'" style="margin-top:4px" placeholder="Ketik nama...">'+(dbMatch?'<div class="fg-hint"><i class="fas fa-database text-blue-400"></i>Data otomatis dari database</div>':'')+'</div><div class="fg"><label class="fg-label">NIK<span class="req">*</span></label><input id="fNik" type="text" value="'+esc(m.nik)+'" maxlength="16" class="fg-input font-mono"></div><div class="fg"><label class="fg-label">No. Telepon</label><input id="fTlp" type="text" value="'+esc(m.noTelepon||'')+'" class="fg-input"></div><div class="fg"><label class="fg-label">Alamat<span class="req">*</span></label><input id="fAl" type="text" value="'+esc(m.alamat)+'" class="fg-input" placeholder="Ketik alamat..."></div></div></div></div>'+'<div class="f-section"><div class="f-section-hd"><i class="fas fa-id-badge shd-purple"></i>Jenis Petugas & Tanggal</div><div class="f-section-bd"><div class="f-row f-row-3" style="margin-bottom:8px"><div class="fg"><label class="fg-label">Jenis Petugas<span class="req">*</span></label>'+ssHTML('ss-jenis-petugas',jenisOpts,m.jenisPetugas||'PCL','Pilih jenis...')+'</div><div class="fg"><label class="fg-label">Tgl TTD</label><input id="fTT" type="date" value="'+(m.tglTandaTangan||'')+'" onchange="updTglPreview()" class="fg-input">'+(S.set.tglTandaTangan?'<div class="fg-hint">Global: '+fTglShort(S.set.tglTandaTangan)+'</div>':'')+'</div><div class="fg"><label class="fg-label">Tgl Selesai</label><input id="fTS" type="date" value="'+(m.tglSelesai||'')+'" onchange="updTglPreview()" class="fg-input">'+(S.set.tglSelesai?'<div class="fg-hint">Global: '+fTglShort(S.set.tglSelesai)+'</div>':'<div class="fg-hint">Default: 31 Agustus 2026</div>')+'</div></div><div id="tglPreview"></div></div></div>'+'<div class="f-section"><div class="f-section-hd"><i class="fas fa-money-bill-wave shd-green"></i>Honorarium & Sanksi</div><div class="f-section-bd"><div class="f-row f-row-2" style="margin-bottom:8px"><div class="fg"><label class="fg-label">Total Honorarium (Rp)<span class="req">*</span></label><input id="fHonor" type="number" value="'+(m.totalHonor||'')+'" min="0" class="fg-input font-mono" oninput="updHonorTerbilang();updNilaiMatch()" placeholder="Contoh: 1500000"><div class="fg-hint">Termasuk pajak, bea meterai, jasa pelayanan keuangan</div><div id="honorTerbilang" class="text-xs text-gray-500 mt-1 font-medium italic">'+(m.totalHonor?terbilang(m.totalHonor)+' rupiah':'')+'</div></div><div class="fg"><label class="fg-label">Sanksi Pelatihan (Rp)<span class="req">*</span></label><input id="fSanksi" type="number" value="'+(m.sanksiPelatihan||'')+'" min="0" class="fg-input font-mono" oninput="updSanksiTerbilang()" placeholder="Sanksi setelah pelatihan"><div id="sanksiTerbilang" class="text-xs text-gray-500 mt-1 font-medium italic">'+(m.sanksiPelatihan?terbilang(m.sanksiPelatihan)+' rupiah':'')+'</div></div></div><div id="nilaiMatchHint" style="margin-bottom:8px"></div></div></div>'+'<div class="f-section"><div class="f-section-hd"><i class="fas fa-table shd-orange"></i>Nilai Perjanjian — Lampiran (Hal. 5)</div><div class="f-section-bd"><div class="bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs text-orange-800 mb-3 flex items-start gap-2"><i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i><div><strong>Kolom 6 lampiran:</strong> Isi nilai rupiah untuk baris 1 (Termin I) dan baris 3 (Termin II). Total kedua nilai akan otomatis dihitung di footer tabel lampiran. Sebaiknya jumlahnya sama dengan Total Honorarium di atas.</div></div><div class="f-row f-row-2" style="margin-bottom:8px"><div class="fg"><label class="fg-label">Nilai Termin I — Baris 1 Kolom 6 (Rp)</label><input id="fNilaiT1" type="number" value="'+(m.nilaiTermin1||'')+'" min="0" class="fg-input font-mono" oninput="updNilaiTerbilang();updNilaiMatch()" placeholder="Contoh: 600000"><div id="nilaiT1Terbilang" class="text-xs text-gray-500 mt-1 font-medium italic">'+(m.nilaiTermin1?terbilang(m.nilaiTermin1)+' rupiah':'')+'</div></div><div class="fg"><label class="fg-label">Nilai Termin II — Baris 3 Kolom 6 (Rp)</label><input id="fNilaiT2" type="number" value="'+(m.nilaiTermin2||'')+'" min="0" class="fg-input font-mono" oninput="updNilaiTerbilang();updNilaiMatch()" placeholder="Contoh: 900000"><div id="nilaiT2Terbilang" class="text-xs text-gray-500 mt-1 font-medium italic">'+(m.nilaiTermin2?terbilang(m.nilaiTermin2)+' rupiah':'')+'</div></div></div><div id="nilaiSumBox"></div></div></div>'+'<div class="f-section"><div class="f-section-hd"><i class="fas fa-sticky-note shd-blue"></i>Catatan</div><div class="f-section-bd"><textarea id="fCatatan" rows="2" class="fg-input" style="resize:none" placeholder="Opsional...">'+esc(m.catatan||'')+'</textarea></div></div>'+'<div class="flex justify-between pt-2" style="margin-top:4px"><button onclick="cM()" class="btn-g px-5 py-2.5 rounded-xl text-sm font-medium"><i class="fas fa-arrow-left mr-1.5"></i>Batal</button><button onclick="saveMitra(\''+(m.id||'')+'\')" class="btn-p px-6 py-2.5 rounded-xl text-sm font-semibold"><i class="fas fa-save mr-1.5"></i>'+(isEdit?'Simpan Perubahan':'Simpan Kontrak')+'</button></div></div>'}
+function handleNamaSelect(val){const mi=$('fNmManual'),ni=$('fNik'),tl=$('fTlp'),al=$('fAl');if(val==='__manual__'){mi.classList.remove('hidden');mi.focus();setRO(ni,false);setRO(tl,false);setRO(al,false);ni.value='';tl.value='';al.value=''}else if(val){const d=S.dbMitra.find(x=>x.id===val);if(d){mi.classList.add('hidden');mi.value='';ni.value=d.nik;tl.value=d.noHp||'';al.value=d.alamat;setRO(ni,true);setRO(tl,true);setRO(al,true);toast('Data dari database terisi otomatis','info')}}else{mi.classList.add('hidden');mi.value='';ni.value='';tl.value='';al.value='';setRO(ni,false);setRO(tl,false);setRO(al,false)}}
+function handleJenisSelect(val){updTglPreview()}
+function setRO(el,ro){if(!el)return;if(ro){el.setAttribute('readonly','');el.classList.add('fg-ro')}else{el.removeAttribute('readonly');el.classList.remove('fg-ro')}}
+function updHonorTerbilang(){const v=Number($('fHonor').value)||0;$('honorTerbilang').textContent=v?terbilang(v)+' rupiah':''}
+function updSanksiTerbilang(){const v=Number($('fSanksi').value)||0;$('sanksiTerbilang').textContent=v?terbilang(v)+' rupiah':''}
+function updNilaiTerbilang(){const v1=Number($('fNilaiT1').value)||0,v2=Number($('fNilaiT2').value)||0;$('nilaiT1Terbilang').textContent=v1?terbilang(v1)+' rupiah':'';$('nilaiT2Terbilang').textContent=v2?terbilang(v2)+' rupiah':'';const sum=v1+v2;const box=$('nilaiSumBox');if(sum>0){box.innerHTML='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;background:linear-gradient(135deg,#f0f4f8,#e8edf3);border:1.5px solid #c9d1dc;border-radius:8px"><span style="font-size:11px;color:#64748b;font-weight:600">Total Lampiran:</span><span style="font-family:monospace;font-size:13px;font-weight:700;color:#0f172a">'+Number(sum).toLocaleString('id-ID')+'</span><span style="font-size:11px;color:#94a3b8;font-style:italic">('+terbilang(sum)+' rupiah)</span></div>'}else{box.innerHTML=''}}
+function updNilaiMatch(){const v1=Number($('fNilaiT1').value)||0,v2=Number($('fNilaiT2').value)||0;const sum=v1+v2;const total=Number($('fHonor').value)||0;const hint=$('nilaiMatchHint');if(!hint)return;if(sum>0&&total>0){if(sum===total){hint.innerHTML='<div class="nilai-match ok"><i class="fas fa-check-circle" style="font-size:10px"></i> Total lampiran ('+Number(sum).toLocaleString('id-ID')+') cocok dengan Total Honorarium</div>'}else{hint.innerHTML='<div class="nilai-match mismatch"><i class="fas fa-exclamation-triangle" style="font-size:10px"></i> Total lampiran ('+Number(sum).toLocaleString('id-ID')+') <b>tidak cocok</b> dengan Total Honorarium ('+Number(total).toLocaleString('id-ID')+')</div>'}}else{hint.innerHTML=''}}
+function updTglPreview(){if(_editId){const m=S.mitra.find(x=>x.id===_editId);if(m&&m.nomorKontrak){const nkEl=$('fNKPreview'),nkText=$('fNKText');if(nkText)nkText.textContent=m.nomorKontrak;if(nkEl&&!nkEl.classList.contains('locked')){nkEl.className='nk-compact locked';nkEl.id='fNKPreview';const lb=nkEl.querySelector('.nk-label');if(lb)lb.innerHTML='<i class="fas fa-lock" style="font-size:8px;margin-right:2px"></i>Nomor (Tetap)';const ic=nkEl.querySelector('i:last-child');if(ic){ic.className='fas fa-lock';ic.style.color='#64748b'}}$('fNKDupWarn').style.display='none';updTglChipsOnly();return}}const fTT=$('fTT')?.value||'';const preview=getNomorPreview(fTT,_editId);const nkEl=$('fNKPreview'),nkText=$('fNKText'),dupWarn=$('fNKDupWarn');if(nkText)nkText.textContent=preview.nomor;if(nkEl){if(preview.isDup){nkEl.className='nk-compact dup-warn';nkEl.id='fNKPreview';const ic=nkEl.querySelector('i:last-child');if(ic){ic.className='fas fa-exclamation-triangle';ic.style.color=''}const lb=nkEl.querySelector('.nk-label');if(lb)lb.innerHTML='Nomor Kontrak'}else{nkEl.className='nk-compact';nkEl.id='fNKPreview';const ic=nkEl.querySelector('i:last-child');if(ic){ic.className='fas fa-check-circle';ic.style.color=''}const lb=nkEl.querySelector('.nk-label');if(lb)lb.innerHTML='Nomor Kontrak'}}if(dupWarn){if(preview.isDup){dupWarn.style.display='block';dupWarn.innerHTML='<div class="dup-warn-bar"><i class="fas fa-exclamation-triangle"></i><span><b>Duplikat!</b> Sudah dipakai oleh <b>'+esc(preview.conflictWith)+'</b>.</span></div>'}else dupWarn.style.display='none'}updTglChipsOnly()}
+function updTglChipsOnly(){const fTT=$('fTT')?.value||'',fTS=$('fTS')?.value||'';const useTT=fTT||S.set.tglTandaTangan||'',useSelesai=fTS||S.set.tglSelesai||'';const jp=ssVal('ss-jenis-petugas')||'PCL';let infoText='';if(jp==='PCL_UB')infoText='<span class="tgl-chip from-custom"><i class="fas fa-building" style="font-size:8px"></i>PCL UB</span> Termin I: 16 Mei – 15 Juni · Termin II: 16 Juni – 31 Juli';else infoText='<span class="tgl-chip from-custom"><i class="fas fa-walking" style="font-size:8px"></i>PCL</span> Termin I: 15 Juni – 16 Juli · Termin II: 16 Juli – 31 Agustus';const el=$('tglPreview');if(!el)return;el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'+infoText+(useTT?'<span style="font-size:10px;color:#cbd5e1">|</span><span class="tgl-chip from-custom"><i class="fas fa-calendar-day" style="font-size:8px"></i>TTD: '+fTglShort(useTT)+'</span>':'')+(useSelesai?'<span style="font-size:10px;color:#cbd5e1">|</span><span class="tgl-chip from-custom"><i class="fas fa-flag-checkered" style="font-size:8px"></i>Selesai: '+fTglShort(useSelesai)+'</span>':'')+((!fTT&&!fTS)?'<span class="snap-badge" style="margin-left:2px"><i class="fas fa-camera"></i>Akan snapshot dari global</span>':'<span class="snap-badge" style="margin-left:2px;background:#fef3c7;border-color:#fde68a;color:#92400e"><i class="fas fa-lock"></i>Custom</span>')+'</div>'}
+function saveMitra(editId){const ssVal_nama=ssVal('ss-mitra-nm');let nama='';if(ssVal_nama==='__manual__')nama=$('fNmManual').value.trim();else if(ssVal_nama){const d=S.dbMitra.find(x=>x.id===ssVal_nama);nama=d?d.nama:''}if(!nama)return toast('Nama wajib diisi','warning');const nik=$('fNik').value.trim(),alamat=$('fAl').value.trim();if(!nik||nik.length<10)return toast('NIK tidak valid','warning');if(!alamat)return toast('Alamat wajib diisi','warning');const tl=$('fTlp').value.trim(),tglTT=$('fTT').value.trim(),tglSelesai=$('fTS').value.trim();const snapTT=tglTT||S.set.tglTandaTangan||'';const snapTS=tglSelesai||S.set.tglSelesai||'';const jp=ssVal('ss-jenis-petugas')||'PCL';const totalHonor=Number($('fHonor').value)||0;const sanksiPelatihan=Number($('fSanksi').value)||0;const nilaiTermin1=Number($('fNilaiT1').value)||0;const nilaiTermin2=Number($('fNilaiT2').value)||0;const catatan=$('fCatatan').value.trim();if(!totalHonor)return toast('Honorarium wajib diisi','warning');if(editId){const idx=S.mitra.findIndex(x=>x.id===editId);if(idx>-1)S.mitra[idx]={...S.mitra[idx],nama,nik,alamat,noTelepon:tl,tglTandaTangan:snapTT,tglSelesai:snapTS,jenisPetugas:jp,totalHonor,sanksiPelatihan,nilaiTermin1,nilaiTermin2,catatan,updatedAt:new Date().toISOString()};toast('Data diperbarui (nomor: '+S.mitra.find(x=>x.id===editId)?.nomorKontrak+')')}else{const preview=getNomorPreview(snapTT,'');if(preview.isDup){toast('Duplikat! Nomor '+preview.nomor+' sudah dipakai oleh "'+preview.conflictWith+'".','error');return}S.mitra.push({id:gid(),nomorKontrak:preview.nomor,nama,nik,alamat,noTelepon:tl,tglTandaTangan:snapTT,tglSelesai:snapTS,jenisPetugas:jp,totalHonor,sanksiPelatihan,nilaiTermin1,nilaiTermin2,catatan,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});toast('Kontrak ditambahkan: '+preview.nomor)}aSave();cM();render()}
+function editM(id){const m=S.mitra.find(x=>x.id===id);if(!m)return;_editId=id;oM('<i class="fas fa-pen text-amber-500 mr-2"></i>Edit Kontrak SE2026',mitraFormHTML(m,true),true,id);setTimeout(()=>{ssInit('ss-mitra-nm',handleNamaSelect);ssInit('ss-jenis-petugas',handleJenisSelect);updTglPreview();updHonorTerbilang();updSanksiTerbilang();updNilaiTerbilang();updNilaiMatch()},60)}
+function delM(id){const m=S.mitra.find(x=>x.id===id);if(!m)return;oCf('Hapus Kontrak','"'+m.nama+'" ('+m.nomorKontrak+') akan dihapus.',()=>{S.mitra=S.mitra.filter(x=>x.id!==id);regenAllNomor();aSave();render();toast('Kontrak berhasil dihapus')})}
+
+function rSettings(){const s=S.set;return'<div class="fade-in max-w-3xl mx-auto"><div class="mb-6"><h2 class="text-2xl font-bold">Pengaturan</h2><p class="text-gray-500 text-sm mt-1">Konfigurasi PPK/BPS untuk SE2026</p></div><div class="bg-white rounded-2xl border border-cool-200 shadow-sm p-6 space-y-6"><div class="bg-blue-50 rounded-xl p-4 text-sm text-blue-800 flex items-start gap-3"><i class="fas fa-info-circle mt-0.5"></i><div><strong>Format nomor:</strong> DDMMNNN/PPK/SE2026/YYYY — YYYY diambil dari <b>tahun TTD</b>. Nomor kontrak yang sudah dibuat <b>tidak berubah</b>.</div></div><div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-landmark"></i> Pejabat Pembuat Komitmen</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Nama PPK <span class="text-red-400">*</span></label><input id="sPpkNm" type="text" value="'+esc(s.ppkNama)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm" placeholder="Dr. Ahmad Fauzi, M.Si"></div><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">NIP <span class="text-red-400">*</span></label><input id="sPpkNip" type="text" value="'+esc(s.ppkNip)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm font-mono" placeholder="19800101 201001 1 001"></div></div></div><div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-building"></i> Informasi BPS</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Nama BPS <span class="text-red-400">*</span></label><input id="sBpsNm" type="text" value="'+esc(s.bpsNama)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Alamat BPS <span class="text-red-400">*</span></label><input id="sBpsAl" type="text" value="'+esc(s.bpsAlamat)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Kota <span class="text-red-400">*</span></label><input id="sKota" type="text" value="'+esc(s.kota)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div></div></div><div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-calendar-alt"></i> Tanggal Default SE2026</h3><div class="bg-amber-50 rounded-xl p-3 text-xs text-amber-800 mb-4 flex items-start gap-2"><i class="fas fa-shield-alt mt-0.5"></i><div><strong>Snapshot:</strong> Tanggal dikunci ke data kontrak saat disimpan. Mengubah di sini <b>tidak mengubah</b> kontrak lama.</div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-xs font-medium text-gray-500 mb-1">Honor Maksimal (Rp) <span class="text-red-400">*</span></label><input id="sHonor" type="number" value="'+s.honorMaks+'" min="0" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm font-mono"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Tgl TTD Default</label><input id="sTgl" type="date" value="'+s.tglTandaTangan+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm">'+(s.tglTandaTangan?'<div class="fg-hint" style="margin-top:2px"><i class="fas fa-calendar-check text-green-400"></i>'+fTglShort(s.tglTandaTangan)+'</div>':'<div class="fg-hint" style="margin-top:2px"><i class="fas fa-exclamation-circle text-amber-400"></i>Belum diisi</div>')+'</div><div><label class="block text-xs font-medium text-gray-500 mb-1">Tgl Selesai Default</label><input id="sTglSelesai" type="date" value="'+s.tglSelesai+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"><div class="fg-hint" style="margin-top:2px"><i class="fas '+(s.tglSelesai?'fa-lock text-green-400':'fa-magic text-blue-400')+'"></i>'+(s.tglSelesai?'Manual: '+fTglShort(s.tglSelesai):'Kosongkan = 31 Agustus 2026')+'</div></div></div><div class="bg-gradient-to-br from-navy-900 to-navy-800 rounded-xl p-4 text-white mt-4"><div class="flex flex-wrap gap-6 text-xs"><div><span class="text-blue-300/50 block mb-1">PERIODE SE2026</span><span class="text-lg font-bold">Juni – Agustus 2026</span></div><div><span class="text-blue-300/50 block mb-1">TTD DEFAULT</span><span class="text-blue-200 font-medium">'+fTglShort(s.tglTandaTangan||'-')+'</span></div><div><span class="text-blue-300/50 block mb-1">SELESAI</span><span class="text-blue-200 font-medium">'+fTglShort(s.tglSelesai||'31 Agustus 2026')+'</span></div><div><span class="text-blue-300/50 block mb-1">HONOR MAKS</span><span class="text-gold-400 font-semibold">'+fRp(s.honorMaks)+'</span></div></div></div></div><div class="flex justify-end"><button onclick="saveSettings()" class="btn-p px-8 py-3 rounded-xl text-sm font-semibold"><i class="fas fa-save mr-2"></i>Simpan Pengaturan</button></div></div></div>'}
+function saveSettings(){const ppkNama=$('sPpkNm').value.trim(),ppkNip=$('sPpkNip').value.trim(),bpsNama=$('sBpsNm').value.trim(),bpsAlamat=$('sBpsAl').value.trim(),kota=$('sKota').value.trim(),honorMaks=Number($('sHonor').value)||0;if(!ppkNama)return toast('Nama PPK wajib diisi','warning');if(!ppkNip)return toast('NIP PPK wajib diisi','warning');if(!bpsNama)return toast('Nama BPS wajib diisi','warning');if(!bpsAlamat)return toast('Alamat BPS wajib diisi','warning');if(!kota)return toast('Kota wajib diisi','warning');if(!honorMaks||honorMaks<=0)return toast('Honor maksimal harus > 0','warning');S.set.ppkNama=ppkNama;S.set.ppkNip=ppkNip;S.set.bpsNama=bpsNama;S.set.bpsAlamat=bpsAlamat;S.set.kota=kota;S.set.honorMaks=honorMaks;S.set.tglTandaTangan=$('sTgl').value;S.set.tglSelesai=$('sTglSelesai').value.trim()||'';regenAllNomor();aSave();render();toast('Pengaturan berhasil disimpan')}
+
+/* ===== EXPORT / IMPORT ===== */
+var impMode='merge';
+function rExIm(){return'<div class="fade-in max-w-3xl mx-auto"><div class="mb-6"><h2 class="text-2xl font-bold">Export / Import</h2><p class="text-gray-500 text-sm mt-1">Backup dan pemulihan data</p></div><div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="bg-white rounded-2xl border border-cool-200 shadow-sm p-6"><div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center mb-4"><i class="fas fa-file-export text-green-600 text-lg"></i></div><h3 class="font-bold mb-1">Export</h3><p class="text-gray-500 text-sm mb-5">Unduh seluruh data.</p><div class="space-y-3"><button onclick="exJSON()" class="w-full btn-g px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2"><i class="fas fa-code text-gold-600"></i>Export JSON</button><button onclick="exCSV()" class="w-full btn-g px-4 py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-2"><i class="fas fa-table text-blue-600"></i>Export CSV</button></div></div><div class="bg-white rounded-2xl border border-cool-200 shadow-sm p-6"><div class="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center mb-4"><i class="fas fa-file-import text-amber-600 text-lg"></i></div><h3 class="font-bold mb-1">Import</h3><p class="text-gray-500 text-sm mb-5">Pulihkan dari JSON.</p><div class="space-y-4"><div class="border-2 border-dashed border-cool-200 rounded-xl p-6 text-center hover:border-gold-400 transition-colors"><i class="fas fa-cloud-upload-alt text-2xl text-gray-300 mb-2"></i><p class="text-sm text-gray-500 mb-3">Seret file atau</p><label class="inline-block cursor-pointer btn-p px-4 py-2 rounded-xl text-sm font-medium">Pilih File<input type="file" accept=".json" onchange="imJSON(this.files[0])" class="hidden"></label></div><div class="flex gap-2"><button onclick="impMode=\'merge\';render()" class="flex-1 px-3 py-2 rounded-lg text-xs font-medium '+(impMode==='merge'?'bg-navy-900 text-white':'bg-cool-100 text-gray-600')+' transition">Gabungkan</button><button onclick="impMode=\'replace\';render()" class="flex-1 px-3 py-2 rounded-lg text-xs font-medium '+(impMode==='replace'?'bg-navy-900 text-white':'bg-cool-100 text-gray-600')+' transition">Ganti Semua</button></div></div></div></div><div class="mt-8 bg-white rounded-2xl border border-cool-200 shadow-sm p-6"><h3 class="font-bold mb-4 flex items-center gap-2"><i class="fas fa-database text-gold-600"></i> Ringkasan</h3><div class="grid grid-cols-2 md:grid-cols-4 gap-4"><div class="bg-cool-50 rounded-xl p-4 text-center"><p class="text-2xl font-bold">'+S.dbMitra.length+'</p><p class="text-xs text-gray-500 mt-1">DB Mitra</p></div><div class="bg-cool-50 rounded-xl p-4 text-center"><p class="text-2xl font-bold">'+S.mitra.length+'</p><p class="text-xs text-gray-500 mt-1">Kontrak</p></div><div class="bg-cool-50 rounded-xl p-4 text-center"><p class="text-lg font-bold">'+fRp(S.mitra.reduce((s,m)=>s+(m.totalHonor||0),0))+'</p><p class="text-xs text-gray-500 mt-1">Total Honor</p></div><div class="bg-cool-50 rounded-xl p-4 text-center"><p class="text-2xl font-bold '+(findDuplicates().length?'text-red-600':'')+'">'+findDuplicates().length+'</p><p class="text-xs text-gray-500 mt-1">Duplikat</p></div></div><div class="mt-4 flex flex-wrap gap-3"><button onclick="oCf(\'Hapus Semua Data\',\'Seluruh data akan dihapus permanen.\',()=>{S.mitra=[];S.dbMitra=[];localStorage.removeItem(\'se2026App\');$(\'svSt\').textContent=\'Data dihapus\';S.lastSaved=null;render();toast(\'Semua data dihapus\')})" class="btn-d px-4 py-2.5 rounded-xl text-sm font-medium"><i class="fas fa-trash-alt mr-2"></i>Hapus Semua</button>'+(findDuplicates().length?'<button onclick="fixDuplicates();aSave();render();toast(\'Duplikat diperbaiki\')" class="btn-p px-4 py-2.5 rounded-xl text-sm font-medium"><i class="fas fa-wrench mr-2"></i>Perbaiki Duplikat</button>':'')+'</div></div></div>'}
+function exJSON(){if(!S.mitra.length&&!S.set.ppkNama&&!S.dbMitra.length)return toast('Tidak ada data','warning');dl(JSON.stringify({version:'SE2026-1.0',app:'KONTRAK_SE2026',exportDate:new Date().toISOString(),settings:S.set,mitra:S.mitra,dbMitra:S.dbMitra},null,2),'se2026-backup-'+new Date().toISOString().split('T')[0]+'.json','application/json');toast('Export berhasil')}
+function exCSV(){if(!S.mitra.length)return toast('Tidak ada data','warning');var h=['No','Nomor','Nama','NIK','Alamat','Telepon','Jenis','TTD','Selesai','Honor','Sanksi','NilaiTermin1','NilaiTermin2'];var rows=[];S.mitra.forEach(function(m,i){rows.push([i+1,m.nomorKontrak,m.nama,m.nik,m.alamat,m.noTelepon,m.jenisPetugas==='PCL_UB'?'PCL UB':'PCL',m.tglTandaTangan||'-',m.tglSelesai||'-',m.totalHonor,m.sanksiPelatihan,m.nilaiTermin1||0,m.nilaiTermin2||0])});dl('\ufeff'+[h].concat(rows).map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'se2026-'+new Date().toISOString().split('T')[0]+'.csv','text/csv;charset=utf-8');toast('CSV berhasil')}
+function dl(c,f,t){var b=new Blob([c],{type:t}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=f;a.click();URL.revokeObjectURL(u)}
+function imJSON(file){if(!file)return;var r=new FileReader();r.onload=function(e){try{var d=JSON.parse(e.target.result);if(!d.mitra&&!d.settings&&!d.dbMitra)throw new Error('Format tidak valid');if(impMode==='replace'){if(d.settings)Object.assign(S.set,d.settings);S.mitra=d.mitra||[];S.dbMitra=d.dbMitra||[]}else{if(d.settings&&!S.set.ppkNama)Object.assign(S.set,d.settings);var exI=new Set(S.mitra.map(function(m){return m.id}));(d.mitra||[]).forEach(function(m){if(exI.has(m.id))m.id=gid();S.mitra.push(m)});var exD=new Set(S.dbMitra.map(function(m){return m.id}));(d.dbMitra||[]).forEach(function(m){if(exD.has(m.id))m.id=gid();S.dbMitra.push(m)})}S.dbMitra.forEach(function(m){if(m.aktif===undefined)m.aktif=true});S.mitra.forEach(function(m){if(m.nilaiTermin1===undefined)m.nilaiTermin1=0;if(m.nilaiTermin2===undefined)m.nilaiTermin2=0});regenAllNomor();aSave();render();toast('Berhasil mengimpor')}catch(err){toast('Gagal: '+err.message,'error')}};r.readAsText(file)}
+
+/* ====================================================================
+   PRINT CSS — TAMPILAN PREVIEW SAMA DENGAN HASIL CETAK
+   Body putih bersih, kertas tanpa shadow/margin,
+   toolbar kecil melayang di pojok tanpa menggeser layout
+   ==================================================================== */
+function _printCSS(isMulti){return'<style>'
+/* --- Page rules --- */
++'@page{size:A4 portrait;margin:21mm 20mm 21mm 26mm}'
++'@page lampiran{size:A4 landscape;margin:18mm 22mm 18mm 22mm}'
+
+/* --- Body: putih bersih baik di layar maupun cetak --- */
++'*{margin:0;padding:0;box-sizing:border-box}'
++'body{font-family:\'Times New Roman\',Times,serif;font-size:12pt;line-height:1.7;color:#000;background:#fff}'
+
+/* --- Kertas: TANPA shadow, TANPA margin, TANPA border --- */
+/*     Di layar: lebar persis A4, margin auto untuk center    */
+/*     Di cetak: lebar auto, margin/padding/shadow dihapus    */
++'.paper{width:210mm;min-height:297mm;margin:0 auto;padding:0;background:#fff;position:relative;box-sizing:border-box}'
++'.paper-lampiran{width:297mm;min-height:210mm;margin:0 auto 0 auto;padding:0;background:#fff;position:relative;box-sizing:border-box;page:lampiran}'
+
++'@media print{'
++'  body{background:#fff!important}'
++'  .paper{width:auto;min-height:auto;margin:0!important;padding:0!important;box-shadow:none!important}'
++'  .paper-lampiran{width:auto;min-height:auto;margin:0!important;padding:0!important;box-shadow:none!important}'
++'  .no-print{display:none!important}'
++'  .print-page-sep{page-break-before:always}'
++'}'
+
+/* --- Komponen dokumen --- */
++'.kop{text-align:center;padding-bottom:6pt;margin-bottom:8pt;border-bottom:2px solid #000}'
++'.kop-title{font-size:12pt;font-weight:bold;text-transform:uppercase;letter-spacing:.4pt;line-height:1.5}'
++'.kop-title .title-main{font-size:13pt;display:block;margin-bottom:1pt}'
++'.kop-nomor{font-size:11pt;font-weight:bold;margin-top:4pt;letter-spacing:.2pt}'
++'.pihak-row{display:flex;margin-bottom:4pt;text-align:justify;align-items:flex-start}'
++'.pihak-num{width:14pt;flex-shrink:0;padding-right:2pt}'
++'.pihak-name{width:155pt;flex-shrink:0;padding-right:2pt}'
++'.pihak-colon{width:10pt;flex-shrink:0;padding-right:5pt}'
++'.pihak-desc{flex:1}'
++'.pasal-title{font-weight:bold;margin-top:10pt;margin-bottom:3pt;font-size:12pt;text-align:center}'
++'.ayat-row{display:flex;margin-bottom:2pt;text-align:justify;align-items:flex-start}'
++'.ayat-num{width:22pt;flex-shrink:0;text-align:left}'
++'.ayat-text{flex:1;text-align:justify}'
++'.sub-row{display:flex;margin-bottom:2pt;text-align:justify;align-items:flex-start;padding-left:1.27cm}'
++'.sub-letter{width:18pt;flex-shrink:0}'
++'.sub-text{flex:1;text-align:justify}'
++'.lamp-table{border-collapse:collapse;width:100%;margin:6pt 0;font-size:10.5pt;table-layout:fixed}'
++'.lamp-table th,.lamp-table td{border:1px solid #000;padding:5pt 6pt;vertical-align:middle}'
++'.lamp-table th{background:#f5f5f5;font-weight:bold;text-align:center}'
++'.lamp-table .col-no{text-align:center;width:5%}'
++'.lamp-table .col-tugas{text-align:left;width:42%}'
++'.lamp-table .col-waktu{text-align:center;width:18%}'
++'.lamp-table .col-target{text-align:center;width:10%}'
++'.lamp-table .col-satuan{text-align:center;width:10%}'
++'.lamp-table .col-nilai{text-align:right;width:15%}'
++'.lamp-table tfoot td{font-weight:bold;background:#fafafa}'
++'.lamp-header{text-align:center;font-weight:bold;font-size:11pt;margin-bottom:8pt;text-decoration:underline}'
++'.ttd-table{width:100%;border-collapse:collapse;margin-top:28pt}'
++'.ttd-table td{width:50%;text-align:center;vertical-align:top}'
++'.ttd-title{font-weight:bold;margin-bottom:3px}'
++'.ttd-space{height:65px}'
++'.ttd-name{margin:0;line-height:1.3;font-weight:bold}'
++'.penutup{margin-top:10pt;text-align:justify;text-indent:0}'
+
+/* --- Toolbar: melayang di pojok kanan atas, KECIL, tidak menggeser layout --- */
++'.print-toolbar{position:fixed;top:12px;right:12px;z-index:9999;display:flex;align-items:center;gap:8px;background:rgba(12,26,48,.95);backdrop-filter:blur(10px);padding:8px 14px;border-radius:12px;box-shadow:0 4px 20px rgba(0,0,0,.25),0 0 0 1px rgba(196,154,42,.15);font-family:Outfit,sans-serif}'
++'.print-toolbar .pt-info{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.7);font-size:11px}'
++'.print-toolbar .pt-info i{color:#dab43e;font-size:13px}'
++'.print-toolbar .pt-info .pt-nama{color:#fff;font-weight:600;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}'
++'.print-toolbar .pt-info .pt-sep{color:rgba(255,255,255,.2)}'
++'.print-toolbar .pt-info .pt-nomor{font-family:monospace;font-size:10px;color:rgba(255,255,255,.5)}'
++'.print-toolbar .pt-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 16px;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;font-family:Outfit,sans-serif;box-shadow:0 2px 8px rgba(37,99,235,.4);transition:all .15s;white-space:nowrap}'
++'.print-toolbar .pt-btn:hover{background:linear-gradient(135deg,#1d4ed8,#1e40af);transform:translateY(-1px)}'
++'.print-toolbar .pt-close{display:inline-flex;align-items:center;justify-content:center;width:28px;height:28px;background:rgba(255,255,255,.08);color:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.12);border-radius:7px;cursor:pointer;font-size:11px;transition:all .15s}'
++'.print-toolbar .pt-close:hover{background:rgba(255,255,255,.15);color:#fff}'
++'@media print{.print-toolbar{display:none!important}}'
++'</style>'}
+
+/* --- Toolbar HTML: KECIL di pojok, TANPA spacer menggeser layout --- */
+function _printToolbar(sub,mono,btnLabel){return'<div class="print-toolbar no-print">'
++'<div class="pt-info">'
++'<i class="fas fa-file-contract"></i>'
++'<span class="pt-nama">'+sub+'</span>'
++'<span class="pt-sep">|</span>'
++'<span class="pt-nomor">'+mono+'</span>'
++'</div>'
++'<button class="pt-btn" onclick="window.onafterprint=function(){window.close()};window.print()"><i class="fas fa-print"></i> '+btnLabel+'</button>'
++'<button class="pt-close" onclick="window.close()" title="Tutup"><i class="fas fa-times"></i></button>'
++'</div>'}
+
+/* ===== KONTRAK BODY — ISI MENGALIR NATURAL
+   Baris 1 kolom 6: nilaiTermin1 (dari input form)
+   Baris 3 kolom 6: nilaiTermin2 (dari input form)
+   Footer total: jumlah keduanya
+   ==================================================================== */
+function _contractBody(m){
+var s=S.set;
+var tglTT=m.tglTandaTangan||S.set.tglTandaTangan||'';
+var tgl=new Date(tglTT);
+var dd=tgl.getDate(),mm=tgl.getMonth(),yy=tgl.getFullYear();
+var hariT=HR[tgl.getDay()];
+var tanggalStr=terbilang(dd)+' bulan '+BL[mm].toLowerCase()+' tahun dua ribu dua puluh enam';
+var tglSelesai=m.tglSelesai||S.set.tglSelesai||'2026-08-31';
+var isUB=m.jenisPetugas==='PCL_UB';
+var honorVal=m.totalHonor||0;
+var honorStr=fRp(honorVal);
+var honorTerbilang=terbilang(honorVal);
+var sanksiVal=m.sanksiPelatihan||0;
+var sanksiStr=fRp(sanksiVal);
+var sanksiTerbilang=terbilang(sanksiVal);
+
+var nt1=m.nilaiTermin1||0;
+var nt2=m.nilaiTermin2||0;
+var ntTotal=nt1+nt2;
+var ntTotalTerbilang=terbilang(ntTotal);
+var nt1Display=nt1?Number(nt1).toLocaleString('id-ID'):'-';
+var nt2Display=nt2?Number(nt2).toLocaleString('id-ID'):'-';
+var ntTotalDisplay=ntTotal?Number(ntTotal).toLocaleString('id-ID'):'-';
+
+function ar(n,t){return'<div class="ayat-row"><span class="ayat-num">('+n+').</span><span class="ayat-text">'+t+'</span></div>'}
+function sr(letter,t){return'<div class="sub-row"><span class="sub-letter">'+letter+'.</span><span class="sub-text">'+t+'</span></div>'}
+
+var lampTabel='';
+if(isUB){
+lampTabel='<div class="lamp-header">DAFTAR URAIAN TUGAS, JANGKA WAKTU, TARGET PEKERJAAN DAN NILAI PERJANJIAN</div>'
++'<table class="lamp-table"><thead><tr><th class="col-no">No</th><th class="col-tugas" style="text-align:center">Uraian Tugas</th><th class="col-waktu">Jangka Waktu</th><th class="col-target">Target Pekerjaan</th><th class="col-satuan">Satuan</th><th class="col-nilai" style="text-align:center">Nilai Perjanjian</th></tr></thead><tbody>'
++'<tr><td class="col-no">1</td><td class="col-tugas">Melakukan pendataan Lapangan Sensus Ekonomi 2026 UB Tahap 1 (40%)</td><td class="col-waktu">16 Mei 2026 – 15 Juni 2026</td><td class="col-target"></td><td class="col-satuan">Usaha Besar</td><td class="col-nilai">'+nt1Display+'</td></tr>'
++'<tr><td class="col-no">2</td><td class="col-tugas">Memastikan kelengkapan dokumen hasil lapangan</td><td class="col-waktu">16 Mei 2026 – 15 Juni 2026</td><td class="col-target"></td><td class="col-satuan">Usaha Besar</td><td class="col-nilai"></td></tr>'
++'<tr><td class="col-no">3</td><td class="col-tugas">Melakukan pendataan Lapangan Sensus Ekonomi 2026 UB (100%)</td><td class="col-waktu">16 Juni 2026 – 31 Juli 2026</td><td class="col-target"></td><td class="col-satuan">Usaha Besar</td><td class="col-nilai">'+nt2Display+'</td></tr>'
++'<tr><td class="col-no">4</td><td class="col-tugas">Memastikan kelengkapan dokumen hasil lapangan tahap 2</td><td class="col-waktu">16 Juni 2026 – 31 Juli 2026</td><td class="col-target"></td><td class="col-satuan">Usaha Besar</td><td class="col-nilai"></td></tr>'
++'</tbody><tfoot><tr><td colspan="5" style="text-align:center;padding-right:6pt">Total</td><td class="col-nilai" style="padding-right:6pt">'+ntTotalDisplay+'</td></tr>'
++'<tr><td colspan="5" style="text-align:right;padding-right:6pt;font-style:italic">Terbilang:</td><td class="col-nilai" style="text-align:left;font-style:italic">'+ntTotalTerbilang+' rupiah</td></tr></tfoot></table>';
+}else{
+lampTabel='<div class="lamp-header">DAFTAR URAIAN TUGAS, JANGKA WAKTU, TARGET PEKERJAAN DAN NILAI PERJANJIAN</div>'
++'<table class="lamp-table"><thead><tr><th class="col-no">No</th><th class="col-tugas" style="text-align:center">Uraian Tugas</th><th class="col-waktu">Jangka Waktu</th><th class="col-target">Target Pekerjaan</th><th class="col-satuan">Satuan</th><th class="col-nilai" style="text-align:center">Nilai Perjanjian</th></tr></thead><tbody>'
++'<tr><td class="col-no">1</td><td class="col-tugas">Melakukan pendataan Lapangan Sensus Ekonomi 2026 door to door termin 1 (40%)</td><td class="col-waktu">15 Juni 2026 – 16 Juli 2026</td><td class="col-target"></td><td class="col-satuan"></td><td class="col-nilai">'+nt1Display+'</td></tr>'
++'<tr><td class="col-no">2</td><td class="col-tugas">Memastikan kelengkapan dokumen hasil lapangan</td><td class="col-waktu">15 Juni 2026 – 16 Juli 2026</td><td class="col-target"></td><td class="col-satuan"></td><td class="col-nilai"></td></tr>'
++'<tr><td class="col-no">3</td><td class="col-tugas">Melakukan pendataan Lapangan Sensus Ekonomi 2026 door to door (100%)</td><td class="col-waktu">16 Juli 2026 – 31 Agustus 2026</td><td class="col-target"></td><td class="col-satuan"></td><td class="col-nilai">'+nt2Display+'</td></tr>'
++'<tr><td class="col-no">4</td><td class="col-tugas">Memastikan kelengkapan dokumen hasil lapangan tahap 2</td><td class="col-waktu">16 Juli 2026 – 31 Agustus 2026</td><td class="col-target"></td><td class="col-satuan"></td><td class="col-nilai"></td></tr>'
++'</tbody><tfoot><tr><td colspan="5" style="text-align:center;padding-right:6pt">Total</td><td class="col-nilai" style="padding-right:6pt">'+ntTotalDisplay+'</td></tr>'
++'<tr><td colspan="5" style="text-align:right;padding-right:6pt;font-style:italic">Terbilang:</td><td class="col-nilai" style="text-align:left;font-style:italic">'+ntTotalTerbilang+' rupiah</td></tr></tfoot></table>';
+}
+
+var portraitContent='<div class="paper">'
++'<div class="kop"><p class="kop-title"><span class="title-main">Perjanjian Kerja</span>Petugas Pendataan Lapangan Sensus Ekonomi 2026<br>pada '+esc(s.bpsNama)+'</p><p class="kop-nomor">NOMOR: '+esc(m.nomorKontrak)+'</p></div>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:7pt">Pada hari ini, '+hariT.toLowerCase()+', tanggal '+tanggalStr+' bertempat di '+esc(s.kota)+', yang bertanda tangan di bawah ini:</p>'
++'<div class="pihak-row"><span class="pihak-num">1.</span><span class="pihak-name">'+esc(s.ppkNama)+'</span><span class="pihak-colon">:</span><span class="pihak-desc">Pejabat Pembuat Komitmen '+esc(s.bpsNama)+', berkedudukan di '+esc(s.bpsAlamat)+', bertindak untuk dan atas nama '+esc(s.bpsNama)+', selanjutnya disebut sebagai <b>PIHAK PERTAMA</b>.</span></div>'
++'<div class="pihak-row"><span class="pihak-num">2.</span><span class="pihak-name">'+esc(m.nama)+'</span><span class="pihak-colon">:</span><span class="pihak-desc">Petugas Pendataan Lapangan Sensus Ekonomi 2026, berkedudukan di '+esc(m.alamat)+', bertindak untuk dan atas nama diri sendiri, selanjutnya disebut sebagai <b>PIHAK KEDUA</b>.</span></div>'
++'<p style="text-indent:0;text-align:justify;margin-top:6pt;margin-bottom:6pt">bahwa <b>PIHAK PERTAMA</b> dan <b>PIHAK KEDUA</b> yang secara bersama-sama disebut <b>PARA PIHAK</b>, sepakat untuk mengikatkan diri dalam Perjanjian Kerja Petugas Pendataan Lapangan Sensus Ekonomi 2026 pada '+esc(s.bpsNama)+' Nomor: '+esc(m.nomorKontrak)+', yang selanjutnya disebut Perjanjian, dengan ketentuan-ketentuan sebagai berikut:</p>'
++'<p class="pasal-title">Pasal 1</p>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:3pt"><b>PIHAK PERTAMA</b> memberikan pekerjaan kepada <b>PIHAK KEDUA</b> dan <b>PIHAK KEDUA</b> menerima pekerjaan dari <b>PIHAK PERTAMA</b> sebagai Petugas Pendataan Lapangan Sensus Ekonomi 2026 pada '+esc(s.bpsNama)+', dengan lingkup pekerjaan yang ditetapkan oleh <b>PIHAK PERTAMA</b>.</p>'
++'<p class="pasal-title">Pasal 2</p>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:3pt">Ruang lingkup pekerjaan dalam Perjanjian ini mengacu pada wilayah kerja dan beban kerja sebagaimana tertuang dalam lampiran Perjanjian, Pedoman Lapangan Sensus Ekonomi 2026, dan ketentuan-ketentuan lainnya yang ditetapkan oleh <b>PIHAK PERTAMA</b>.</p>'
++'<p class="pasal-title">Pasal 3</p>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:3pt">Jangka waktu Perjanjian ini terhitung sejak ditandatangani sampai dengan tanggal '+fTgl(tglSelesai)+'.</p>'
++'<p class="pasal-title">Pasal 4</p>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:3pt"><b>PIHAK KEDUA</b> berkewajiban menyelesaikan pekerjaan yang diberikan oleh <b>PIHAK PERTAMA</b> sesuai ruang lingkup pekerjaan sebagaimana dimaksud dalam Pasal 2.</p>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:3pt"><b>PIHAK KEDUA</b> untuk waktu yang tidak terbatas dan/atau tidak terikat kepada masa berlakunya Perjanjian ini, menjamin untuk memberlakukan sebagai rahasia setiap data/informasi yang diterima atau diperolehnya dari <b>PIHAK PERTAMA</b>, serta menjamin bahwa keterangan demikian hanya dipergunakan untuk melaksanakan tujuan menurut Perjanjian ini.</p>'
++'<p class="pasal-title">Pasal 5</p>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:3pt"><b>PIHAK KEDUA</b> apabila melakukan peminjaman dokumen/data/aset milik <b>PIHAK PERTAMA</b>, wajib menjaga dan menggunakan sesuai dengan tujuan perjanjian dan mengembalikan dalam keadaan utuh sama dengan saat peminjaman, serta dilarang menggandakan, menyalin, menunjukkan, dan/atau mendokumentasikan dalam bentuk foto atau bentuk apapun untuk kepentingan pribadi ataupun kepentingan lain yang tidak berkaitan dengan tujuan perjanjian ini.</p>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:3pt"><b>PIHAK KEDUA</b> dilarang memberikan dokumen/data/aset milik <b>PIHAK PERTAMA</b> yang berada dalam penguasaan <b>PIHAK KEDUA</b>, baik secara langsung maupun tidak langsung, termasuk memberikan akses kepada pihak lain untuk menggunakan, menyalin, memfotokopi, menunjukkan, dan/atau mendokumentasikan dalam bentuk foto atau bentuk apapun, sehingga informasi diketahui oleh pihak lain untuk tujuan apapun.</p>'
++'<p class="pasal-title">Pasal 6</p>'
++ar(1,'<b>PIHAK KEDUA</b> berhak untuk mendapatkan honorarium dari <b>PIHAK PERTAMA</b> sebesar '+honorStr+' ('+honorTerbilang+' rupiah) untuk pekerjaan sebagaimana dimaksud dalam Pasal 2, termasuk biaya pajak, bea meterai, dan jasa pelayanan keuangan.')
++ar(2,'Selain honorarium sebagaimana dimaksud pada ayat (1), <b>PIHAK KEDUA</b> dapat diberikan paket data dan komunikasi selama pelaksanaan pekerjaan sesuai dengan ketentuan yang ditetapkan <b>PIHAK PERTAMA</b>.')
++'<p class="pasal-title">Pasal 7</p>'
++ar(1,'<b>PIHAK KEDUA</b> berhak untuk mendapatkan asuransi berupa program perlindungan jaminan kecelakaan kerja (JKK) dan jaminan kematian (JKM) dari <b>PIHAK PERTAMA</b> untuk jangka waktu pelaksanaan pendataan pada bulan Juni sampai dengan Agustus 2026.')
++ar(2,'Asuransi sebagaimana dimaksud pada ayat (1) tidak termasuk dalam honorarium sebagaimana dimaksud dalam Pasal 6.')
++'<p class="pasal-title">Pasal 8</p>'
++ar(1,'Pembayaran honorarium sebagaimana dimaksud dalam Pasal 6, dilakukan setelah <b>PIHAK KEDUA</b> menyelesaikan dan menyerahkan hasil pekerjaan sebagaimana dimaksud dalam Pasal 2 kepada <b>PIHAK PERTAMA</b>.')
++ar(2,'Pembayaran sebagaimana dimaksud pada ayat (1) dilakukan oleh <b>PIHAK PERTAMA</b> kepada <b>PIHAK KEDUA</b> sesuai dengan ketentuan peraturan perundang-undangan.')
++ar(3,'Pembayaran honorarium sebagaimana dimaksud pada ayat (1) dibayarkan oleh <b>PIHAK PERTAMA</b> kepada <b>PIHAK KEDUA</b> dalam 2 (dua) termin yang terdiri atas:')
++sr('a','termin I dibayarkan setelah <b>PIHAK KEDUA</b> menyelesaikan dan menyerahkan minimal 40% dari seluruh pekerjaan yang ditargetkan sebagaimana tercantum dalam Lampiran Perjanjian, dituangkan dalam Berita Acara Pemeriksaan Pekerjaan termin I, dan diserahkan paling lambat tanggal '+(isUB?'15 Juni 2026':'16 Juli 2026')+';')
++sr('b','termin II dibayarkan setelah <b>PIHAK KEDUA</b> menyelesaikan dan menyerahkan seluruh pekerjaan yang ditargetkan sebagaimana tercantum dalam Lampiran Perjanjian, dituangkan dalam Berita Acara Serah Terima Hasil Pekerjaan, dan diserahkan paling lambat tanggal 15 September 2026.')
++ar(4,'<b>PIHAK KEDUA</b> tidak diberikan honorarium tambahan apabila melakukan kunjungan di luar jadwal dan/atau terdapat tambahan waktu pelaksanaan pekerjaan di luar jangka waktu Perjanjian sebagaimana dimaksud dalam Pasal 3.')
++'<p class="pasal-title">Pasal 9</p>'
++ar(1,'<b>PIHAK PERTAMA</b> secara berjenjang melalui tim Pelaksana SE2026 di BPS Kota '+esc(s.kota)+' melakukan pemeriksaan dan evaluasi atas target penyelesaian pekerjaan dan kualitas hasil pekerjaan yang dilaksanakan oleh <b>PIHAK KEDUA</b> secara berkala.')
++ar(2,'Hasil pemeriksaan dan evaluasi sebagaimana dimaksud pada ayat (1) menjadi dasar pembayaran honorarium <b>PIHAK KEDUA</b> oleh <b>PIHAK PERTAMA</b> sebagaimana dimaksud dalam Pasal 8 ayat (3), yang dituangkan dalam Berita Acara Pemeriksaan Pekerjaan dan/atau Berita Acara Serah Terima Hasil Pekerjaan yang ditandatangani oleh <b>PARA PIHAK</b>.')
++'<p class="pasal-title">Pasal 10</p>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:3pt"><b>PIHAK PERTAMA</b> dapat memutuskan Perjanjian ini secara sepihak sewaktu-waktu dalam hal <b>PIHAK KEDUA</b> tidak dapat melaksanakan kewajibannya sebagaimana dimaksud dalam Pasal 4, dengan menerbitkan Surat Pemutusan Perjanjian Kerja.</p>'
+/* === HALAMAN 3: Pasal 11 dimulai di sini === */
++'<div style="page-break-before:always"></div>'
++'<p class="pasal-title">Pasal 11</p>'
++ar(1,'Apabila <b>PIHAK KEDUA</b> mengundurkan diri dengan tidak menyelesaikan pekerjaan sebagaimana dimaksud dalam Pasal 2, maka akan diberikan sanksi oleh <b>PIHAK PERTAMA</b>, sebagai berikut:')
++sr('a','mengundurkan diri setelah pelatihan diberikan sanksi sebesar '+sanksiStr+' ('+sanksiTerbilang+' rupiah);')
++sr('b','mengundurkan diri pada saat pelaksanaan pekerjaan, diberikan sanksi tidak diberikan honorarium atas pekerjaan yang telah dilaksanakan.')
++ar(2,'Dikecualikan tidak dikenakan sanksi sebagaimana dimaksud pada ayat (1) oleh <b>PIHAK PERTAMA</b>, apabila <b>PIHAK KEDUA</b> meninggal dunia, mengundurkan diri karena sakit dengan keterangan rawat inap, kecelakaan dengan keterangan kepolisian, dan/atau telah diberikan Surat Pemutusan Perjanjian Kerja dari <b>PIHAK PERTAMA</b>.')
++ar(3,'Dalam hal terjadi peristiwa sebagaimana dimaksud pada ayat (2), <b>PIHAK PERTAMA</b> membayarkan honorarium kepada <b>PIHAK KEDUA</b> secara proporsional sesuai pekerjaan yang telah dilaksanakan.')
++'<p class="pasal-title">Pasal 12</p>'
++ar(1,'Apabila terjadi Keadaan Kahar, yang meliputi bencana alam, bencana nonalam, dan bencana sosial, <b>PIHAK KEDUA</b> memberitahukan kepada <b>PIHAK PERTAMA</b> dalam waktu paling lambat 14 (empat belas) hari sejak mengetahui atas kejadian Keadaan Kahar dengan menyertakan bukti.')
++ar(2,'Apabila terjadi kerusakan perangkat pencacahan yang menyebabkan pelaksanaan Pendataan Lapangan Sensus Ekonomi 2026 tidak dapat dilakukan, <b>PIHAK KEDUA</b> melalui Petugas Pemeriksaan Lapangan memberitahukan kepada <b>PIHAK PERTAMA</b> dalam waktu paling lambat 7 (tujuh) hari kalender sejak terjadi kerusakan dimaksud.')
++ar(3,'Dalam hal terjadi peristiwa sebagaimana dimaksud pada ayat (1) dan/atau ayat (2), pelaksanaan pekerjaan oleh <b>PIHAK KEDUA</b> dihentikan sementara dan dilanjutkan kembali setelah Keadaan Kahar berakhir, merujuk pada ketentuan yang ditetapkan oleh <b>PIHAK PERTAMA</b>.')
++ar(4,'Apabila akibat Keadaan Kahar tidak memungkinkan dilanjutkan/diselesaikannya pelaksanaan pekerjaan, <b>PIHAK KEDUA</b> berhak menerima honorarium secara proporsional sesuai pekerjaan yang telah diselesaikan dan diterima oleh <b>PIHAK PERTAMA</b>.')
+/* === HALAMAN 4: Pasal 13 dimulai di sini === */
++'<div style="page-break-before:always"></div>'
++'<p class="pasal-title">Pasal 13</p>'
++'<p style="text-indent:0;text-align:justify;margin-bottom:3pt">Hal-hal yang belum diatur dalam Perjanjian ini atau segala perubahan terhadap Perjanjian ini diatur lebih lanjut oleh <b>PARA PIHAK</b> dalam perjanjian tambahan/adendum dan merupakan bagian tidak terpisahkan dari Perjanjian ini.</p>'
++'<p class="pasal-title">Pasal 14</p>'
++ar(1,'Segala perselisihan atau perbedaan pendapat yang mungkin timbul sebagai akibat dari Perjanjian ini, diselesaikan secara musyawarah untuk mufakat oleh <b>PARA PIHAK</b>.')
++ar(2,'Apabila musyawarah untuk mufakat sebagaimana dimaksud pada ayat (1) tidak berhasil, maka <b>PARA PIHAK</b> sepakat untuk menyelesaikan perselisihan dengan memilih kedudukan/domisili hukum di Kepaniteraan Pengadilan Negeri '+esc(s.kota)+'.')
++ar(3,'Selama perselisihan dalam proses penyelesaian pengadilan, <b>PIHAK PERTAMA</b> dan <b>PIHAK KEDUA</b> wajib tetap melaksanakan kewajiban masing-masing berdasarkan Perjanjian ini.')
++'<p class="penutup">Demikian Perjanjian ini dibuat dan ditandatangani oleh <b>PARA PIHAK</b> dalam 2 (dua) rangkap asli bermeterai cukup, tanpa paksaan dari <b>PIHAK</b> manapun dan untuk dilaksanakan oleh <b>PARA PIHAK</b>.</p>'
++'<table class="ttd-table"><tr><td><p class="ttd-title">PIHAK KEDUA,</p><div class="ttd-space"></div><p class="ttd-name">'+esc(m.nama)+'</p></td><td><p class="ttd-title">PIHAK PERTAMA,</p><div class="ttd-space"></div><p class="ttd-name">'+esc(s.ppkNama)+'</p></td></tr></table>'
++'</div>';
+
+var landscapeContent='<div class="paper-lampiran">'
++'<p style="text-align:center;font-weight:bold;font-size:12pt;margin-bottom:4pt;text-decoration">LAMPIRAN</p>'
++'<p style="text-align:center;font-weight:bold;font-size:11pt;margin-bottom:2pt">PERJANJIAN KERJA PETUGAS PENDATAAN LAPANGAN SENSUS EKONOMI 2026</p>'
++'<p style="text-align:center;font-size:11pt;margin-bottom:2pt">PADA '+esc(s.bpsNama).toUpperCase()+'</p>'
++'<p style="text-align:center;font-weight:bold;font-size:11pt;margin-bottom:8pt">NOMOR: '+esc(m.nomorKontrak)+'</p>'
++lampTabel
++'</div>';
+
+return portraitContent+landscapeContent;
+}
+
+/* ===== PRINT KONTRAK ===== */
+function printK(id){
+var m=S.mitra.find(function(x){return x.id===id});
+if(!m)return toast('Kontrak tidak ditemukan','error');
+var html='<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8">'
++'<title>Kontrak SE2026 — '+esc(m.nama)+'</title>'
++_printCSS(false)
++'</head><body>'
++_printToolbar(esc(m.nama),esc(m.nomorKontrak),'Cetak')
++_contractBody(m)
++'</body></html>';
+try{
+var blob=new Blob([html],{type:'text/html;charset=utf-8'});
+var url=URL.createObjectURL(blob);
+var w=window.open(url,'_blank','width=1100,height=900,scrollbars=yes');
+if(!w){
+var ifr=document.createElement('iframe');
+ifr.style.cssText='position:fixed;top:0;left:0;width:100vw;height:100vh;border:none;z-index:99999;background:#fff';
+document.body.appendChild(ifr);
+ifr.contentDocument.open();
+ifr.contentDocument.write(html);
+ifr.contentDocument.close();
+setTimeout(function(){ifr.contentWindow.print()},500);
+toast('Popup diblokir — cetak via iframe','warning');
+}
+}catch(e){
+toast('Gagal: '+e.message,'error');
+}
+}
+
+/* ===== SAMPLE DATA ===== */
+function getSampleDbMitra(){var n=gid;return[
+{id:n(),nama:'Anita Razmawati',nik:'1471056406740001',noHp:'081270167173',alamat:'Jl. Perdagangan No.25, RT.003 RW.001,',aktif:true,createdAt:new Date().toISOString()},
+{id:n(),nama:'Adinda Ryvania Abrir',nik:'1471094506950002',noHp:'082285046706',alamat:'Jl. H. Ismail Yusuf No.165',aktif:true,createdAt:new Date().toISOString()},
+{id:n(),nama:'Aju Listia Dewi',nik:'1471076012710001',noHp:'085265422765',alamat:'Jl. Lumba-Lumba No.55',aktif:true,createdAt:new Date().toISOString()},
+{id:n(),nama:'Aked Achirunnas',nik:'1471101510930003',noHp:'087722390496',alamat:'Jl. Hangtuah Ujung No. 1 RT.004 RW.002',aktif:true,createdAt:new Date().toISOString()},
+{id:n(),nama:'Alya Maharani Zahra',nik:'1471094302050067',noHp:'083185517274',alamat:'Jl. Pahlawan Kerja',aktif:true,createdAt:new Date().toISOString()},
+{id:n(),nama:'Alza Khairani Saphyra',nik:'1471075212970022',noHp:'082284741617',alamat:'Jl. T.Bey Perum Korem Blok E No.9',aktif:true,createdAt:new Date().toISOString()},
+{id:n(),nama:'Amelia Putri Ponza',nik:'1471106206000041',noHp:'081268305053',alamat:'Jl. Keliling Gg. Berkah RT.003 RW.011',aktif:true,createdAt:new Date().toISOString()},
+{id:n(),nama:'Aminur Ramaita',nik:'1471034109810021',noHp:'08127073909',alamat:'Jl. Hangtuah Kp Kelapa No.17',aktif:true,createdAt:new Date().toISOString()},
+{id:n(),nama:'Andi Rizal',nik:'1471121104810001',noHp:'081365639184',alamat:'Jl. Bukit Batabuh No.08',aktif:true,createdAt:new Date().toISOString()},
+{id:n(),nama:'Zuryetti',nik:'1471094711780021',noHp:'081378129786',alamat:'Jln Angrek Prum Vaishatama Blok D9',aktif:true,createdAt:new Date().toISOString()}
+]}
+function loadSample(){
+S.set={ppkNama:'Benny Dwi Kifana, ST, M.Si',ppkNip:'19881223 201403 1 002',bpsNama:'Badan Pusat Statistik Kota Pekanbaru',bpsAlamat:'Jl. Rawa Indah No. 2',kota:'Pekanbaru',honorMaks:2500000,tglTandaTangan:'2026-05-15',tglSelesai:'2026-08-31'};
+var now=new Date().toISOString();
+S.mitra=S.dbMitra.map(function(d,i){
+var isUB=i<2;
+var nt1=isUB?800000:600000;
+var nt2=isUB?1200000:900000;
+return{id:gid(),nomorKontrak:'',nama:d.nama,nik:d.nik,alamat:d.alamat,noTelepon:d.noHp,tglTandaTangan:isUB?'2026-05-15':'2026-06-01',tglSelesai:isUB?'2026-07-31':'2026-08-31',jenisPetugas:isUB?'PCL_UB':'PCL',totalHonor:isUB?2000000:1500000,sanksiPelatihan:isUB?500000:300000,nilaiTermin1:nt1,nilaiTermin2:nt2,catatan:'',createdAt:new Date(now).getTime()+i,updatedAt:now};
+});
+regenAllNomor();aSave();render();toast('Data contoh dimuat — '+S.mitra.length+' kontrak SE2026 (2 PCL UB + 8 PCL).')
+}
+
+/* ===== RENDER ===== */
+function render(){
+updBadges();var mc=$('mc');if(!mc)return;
+switch(S.v){
+case 'dashboard':mc.innerHTML=rDash();break;
+case 'dbmitra':mc.innerHTML=rDbMitra();setTimeout(function(){updDbList()},0);break;
+case 'mitra':mc.innerHTML=rMitra();setTimeout(function(){updMitraList()},0);break;
+case 'settings':mc.innerHTML=rSettings();break;
+case 'exim':mc.innerHTML=rExIm();break;
+default:mc.innerHTML=rDash()
+}
+mc.scrollTop=0;window.scrollTo({top:0,behavior:'auto'})
+}
+
+/* ===== INIT ===== */
+loadS();
+S.mitra.forEach(function(m){
+if(m.nilaiTermin1===undefined)m.nilaiTermin1=0;
+if(m.nilaiTermin2===undefined)m.nilaiTermin2=0;
+});
+var initView=S.v||'dashboard';
+document.querySelectorAll('.nav-item').forEach(function(el){el.classList.toggle('active',el.dataset.v===initView)});
+var initTitle=$('sbTitle');
+if(initTitle)initTitle.innerHTML='<i class="fas '+(VNAMES_ICONS[initView]||'fa-file')+' mr-1.5 text-[11px] opacity-70"></i>'+(VNAMES[initView]||'Dashboard');
+document.title=(VNAMES[initView]||'Dashboard')+' — SE2026 BPS';
+render();
+</script>
+</body>
+</html>
