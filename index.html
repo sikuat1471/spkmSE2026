@@ -288,11 +288,18 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:#c49a2a!import
 var HONOR_CONFIG={PPL:{totalHonor:12147500,nilaiTermin1:4859000,nilaiTermin2:7288500},PML:{totalHonor:12800000,nilaiTermin1:5120000,nilaiTermin2:7680000}};
 var SANKSI_CONFIG={Fullday:752785,Fullboard:1781000};
 var DEFAULT_SATUAN=['SLS/SUB SLS','Rangkap','SLS/SUB SLS','Rangkap'];
+
+/* ===== getEffectiveSanksi: gunakan nilai manual jika ada, else dari config ===== */
+function getEffectiveSanksi(){
+    if(S.set.sanksiNilai!==undefined&&S.set.sanksiNilai!==null&&S.set.sanksiNilai!=='')return Number(S.set.sanksiNilai)||0;
+    return SANKSI_CONFIG[S.set.jenisPelatihan||'Fullday']||0;
+}
+
 const VNAMES={dashboard:'Dashboard',dbmitra:'Database Mitra',mitra:'Kontrak Kerja',settings:'Pengaturan',exim:'Export / Import'};
 const VNAMES_ICONS={dashboard:'fa-chart-pie',dbmitra:'fa-address-book',mitra:'fa-file-contract',settings:'fa-cog',exim:'fa-file-export'};
 const BL=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
 const HR=['Minggu','Senin','Selasa','Rabu','Kamis','Jumat','Sabtu'];
-const S={v:'dashboard',set:{ppkNama:'',ppkNip:'',bpsNama:'Badan Pusat Statistik Kota Pekanbaru',bpsAlamat:'Jl. Rawa Indah No. 2',kota:'Pekanbaru',honorMaks:0,tglTandaTangan:'',tglSelesai:'',jenisPelatihan:'Fullday'},mitra:[],dbMitra:[]};
+const S={v:'dashboard',set:{ppkNama:'',ppkNip:'',bpsNama:'Badan Pusat Statistik Kota Pekanbaru',bpsAlamat:'Jl. Rawa Indah No. 2',kota:'Pekanbaru',honorMaks:0,tglTandaTangan:'',tglSelesai:'',jenisPelatihan:'Fullday',sanksiNilai:''},mitra:[],dbMitra:[]};
 const $=id=>document.getElementById(id);
 const gid=()=>Date.now().toString(36)+Math.random().toString(36).substr(2,5);
 function esc(s){if(!s)return'';const d=document.createElement('div');d.textContent=String(s);return d.innerHTML}
@@ -311,10 +318,6 @@ function findDuplicates(){const map=new Map(),dups=[];S.mitra.forEach(m=>{if(!m.
 function formatNomorBadge(nomor,isDup){if(!nomor)return'-';const parts=nomor.split('/');const cls=isDup?'nomor-kontrak-badge dup':'nomor-kontrak-badge';if(parts.length===4)return'<span class="'+cls+'" title="'+(isDup?'NOMOR DUPLIKAT!':'')+'">'+parts[0]+'<span class="nk-slash">/</span>'+parts[1]+'<span class="nk-slash">/</span>'+parts[2]+'<span class="nk-slash">/</span>'+parts[3]+(isDup?' <i class="fas fa-exclamation-triangle" style="font-size:9px"></i>':'')+'</span>';return'<span class="'+cls+'">'+nomor+'</span>'}
 function getYearMonth(tgl){if(!tgl)return'';var d=new Date(tgl);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')}
 
-/* ============================================
-   getAvailableDbMitra — filter nama yang SUDAH
-   punya kontrak (tanpa batas bulan)
-   ============================================ */
 function getAvailableDbMitra(excludeId){
     var usedNames=new Set();
     S.mitra.forEach(function(m){
@@ -331,7 +334,7 @@ function getAvailableDbMitra(excludeId){
 function toast(msg,type){type=type||'success';const ic={success:'fa-check-circle text-green-500',error:'fa-times-circle text-red-500',warning:'fa-exclamation-circle text-amber-500',info:'fa-info-circle text-blue-500'},bg={success:'border-green-200',error:'border-red-200',warning:'border-amber-200',info:'border-blue-200'};const el=document.createElement('div');el.className='toast-in pointer-events-auto flex items-center gap-3 bg-white border '+bg[type]+' rounded-xl shadow-lg px-4 py-3 min-w-[280px] max-w-[420px]';el.innerHTML='<i class="fas '+ic[type]+'"></i><span class="text-sm text-gray-700 flex-1">'+msg+'</span>';$('tC').appendChild(el);setTimeout(function(){el.classList.replace('toast-in','toast-out');setTimeout(function(){el.remove()},250)},3500)}
 let svT=null;
 function aSave(){clearTimeout(svT);svT=setTimeout(function(){try{localStorage.setItem('se2026App',JSON.stringify({v:S.v,set:S.set,mitra:S.mitra,dbMitra:S.dbMitra}));S.lastSaved=new Date();$('svSt').textContent='©Putu_'+S.lastSaved.toLocaleTimeString('id-ID')}catch(e){}},400)}
-function loadS(){try{const d=JSON.parse(localStorage.getItem('se2026App'));if(d){if(d.v)S.v=d.v;if(d.set)Object.assign(S.set,d.set);if(d.mitra)S.mitra=d.mitra;if(d.dbMitra)S.dbMitra=d.dbMitra}else S.dbMitra=getSampleDbMitra();S.dbMitra.forEach(function(m){if(m.aktif===undefined)m.aktif=true});if(!S.set.jenisPelatihan)S.set.jenisPelatihan='Fullday';regenAllNomor();if(S.mitra.length||S.dbMitra.length)$('svSt').textContent='@copyright_putu'}catch(e){if(!S.dbMitra.length)S.dbMitra=getSampleDbMitra()}}
+function loadS(){try{const d=JSON.parse(localStorage.getItem('se2026App'));if(d){if(d.v)S.v=d.v;if(d.set)Object.assign(S.set,d.set);if(d.mitra)S.mitra=d.mitra;if(d.dbMitra)S.dbMitra=d.dbMitra}else S.dbMitra=getSampleDbMitra();S.dbMitra.forEach(function(m){if(m.aktif===undefined)m.aktif=true});if(!S.set.jenisPelatihan)S.set.jenisPelatihan='Fullday';if(S.set.sanksiNilai===undefined)S.set.sanksiNilai='';regenAllNomor();if(S.mitra.length||S.dbMitra.length)$('svSt').textContent='@copyright_putu'}catch(e){if(!S.dbMitra.length)S.dbMitra=getSampleDbMitra()}}
 function toggleSB(){$('sb').classList.toggle('-translate-x-full');$('sbBg').classList.toggle('hidden')}
 function nav(v){S.v=v;_selMitra.clear();_selMode=false;document.querySelectorAll('.nav-item').forEach(function(el){el.classList.toggle('active',el.dataset.v===v)});const titleEl=$('sbTitle');if(titleEl){titleEl.style.opacity='0';titleEl.style.transform='translateY(-4px)';setTimeout(function(){titleEl.innerHTML='<i class="fas '+(VNAMES_ICONS[v]||'fa-file')+' mr-1.5 text-[11px] opacity-70"></i>'+(VNAMES[v]||'Dashboard');titleEl.style.opacity='1';titleEl.style.transform='translateY(0)'},120)}document.title=(VNAMES[v]||'Dashboard')+' — SE2026 BPS';aSave();render();if(window.innerWidth<1024)toggleSB()}
 function oM(t,h,showPrint,mid){$('mTi').innerHTML=t;$('mIn').innerHTML=h;if(showPrint&&mid){var safeId=esc(mid).replace(/'/g,"\\'");$('mPrintBtn').innerHTML='<button onclick="cM();setTimeout(function(){printK(\''+safeId+'\')},150)" class="btn-print px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2"><i class="fas fa-print"></i>Cetak</button>';$('mPrintBtn').classList.remove('hidden')}else $('mPrintBtn').classList.add('hidden');$('mOv').classList.remove('hidden');$('mOv').classList.add('flex');document.body.style.overflow='hidden'}
@@ -365,12 +368,13 @@ function selAllVisible(){const el=$('mitraListWrap');if(!el)return;el.querySelec
 function deselAll(){_selMitra.clear();const el=$('mitraListWrap');if(el)el.querySelectorAll('input[data-mid-cb]').forEach(function(cb){cb.checked=false;const row=cb.closest('tr');if(row)row.classList.remove('row-sel')});updSelHeader();updFloatingBar()}
 function updSelHeader(){const hdr=$('selHdrCb');if(!hdr)return;const el=$('mitraListWrap');const all=el?el.querySelectorAll('input[data-mid-cb]').length:0;const checked=el?el.querySelectorAll('input[data-mid-cb]:checked').length:0;hdr.checked=all>0&&all===checked;hdr.indeterminate=checked>0&&checked<all}
 function updFloatingBar(){const bar=$('floatingBar'),count=$('fbCount');if(!bar||!count)return;count.textContent=_selMitra.size;bar.classList.toggle('show',_selMitra.size>0)}
-function printMultiple(){const ids=[].slice.call(_selMitra);if(!ids.length)return toast('Pilih mitra terlebih dahulu','warning');const mitras=ids.map(function(id){return S.mitra.find(function(m){return m.id===id})}).filter(Boolean);if(!mitras.length)return;const bodies=mitras.map(function(m,i){let b=_contractBody(m);if(i<mitras.length-1)b+='<div class="print-page-sep"></div>';return b}).join('\n');const lbl=esc(mitras[0].nama)+(mitras.length>1?' + '+(mitras.length-1)+' lainnya':'');const html='<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Cetak '+mitras.length+' Kontrak</title>'+_printCSS(true)+'</head><body>'+_printToolbar(lbl,esc(mitras.length+' kontrak'),'Cetak '+mitras.length+' Dokumen')+bodies+'</body></html>';try{const blob=new Blob([html],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);window.open(url,'_blank','width:960,height=800')}catch(e){toast('Gagal: '+e.message,'error')}}
+function printMultiple(){const ids=[].slice.call(_selMitra);if(!ids.length)return toast('Pilih mitra terlebih dahulu','warning');const mitras=ids.map(function(id){return S.mitra.find(function(m){return m.id===id})}).filter(Boolean);if(!mitras.length)return;const bodies=mitras.map(function(m,i){let b=_contractBody(m);if(i<mitras.length-1)b+='<div class="print-page-sep"></div>';return b}).join('\n');const lbl=esc(mitras[0].nama)+(mitras.length>1?' + '+(mitras.length-1)+' lainnya':'');const html='<!DOCTYPE html><html lang="id"><head><meta charset="UTF-8"><title>Cetak '+mitras.length+' Kontrak</title>'+_printCSS(true)+'</head><body>'+_printToolbar(lbl,esc(mitras.length+' kontrak'),'Cetak '+mitras.length+' Dokumen')+bodies+'</body></html>';try{const blob=new Blob([html],{type:'text/html;charset=utf-8'});const url=URL.createObjectURL(blob);window.open(url,'_blank','width:960,height:800')}catch(e){toast('Gagal: '+e.message,'error')}}
 
 function rDash(){const tot=S.mitra.length,pplC=S.mitra.filter(function(m){return m.jenisPetugas==='PPL'}).length,ubC=S.mitra.filter(function(m){return m.jenisPetugas==='PML'}).length;const totalHonor=S.mitra.reduce(function(s,m){return s+(m.totalHonor||0)},0),dups=findDuplicates();const dbAktif=S.dbMitra.filter(function(m){return m.aktif!==false}).length;const hasDb=!!S.dbMitra.length,hasKon=!!S.mitra.length,hasPpk=!!S.set.ppkNama;
+var effectiveSanksi=getEffectiveSanksi();
 if(!hasPpk&&!hasKon){return'<div class="fade-in"><div class="empty-hero p-8 sm:p-12 lg:p-16 text-center relative"><div class="relative z-10"><div class="hero-logo-ring mx-auto mb-6"><img src="https://z-cdn-media.chatglm.cn/files/b8bffa74-ccd7-43df-ac0a-7d38232e3901.png?auth_key=1872868863-b6cd966dc51a4c34aa738032b487a895-0-e6beed34fb7fb9a9650976366f590c26" alt="Logo BPS"></div><h2 class="text-white text-2xl sm:text-3xl font-bold tracking-wide mb-1">BADAN PUSAT STATISTIK</h2><p class="text-blue-300/70 text-sm sm:text-base font-medium tracking-widest uppercase mb-2">Kota Pekanbaru</p><p class="text-gold-400/60 text-xs italic mb-8">Sensus Ekonomi 2026</p><div class="w-16 h-px bg-gradient-to-r from-transparent via-gold-500/40 to-transparent mx-auto mb-8"></div><h3 class="text-white/90 text-lg font-semibold mb-2">Selamat Datang</h3><p class="text-blue-200/50 text-sm mb-6 max-w-md mx-auto">Sistem manajemen kontrak Petugas Pendataan Lapangan SE2026 BPS Kota Pekanbaru.</p><div class="max-w-sm mx-auto space-y-3 text-left mb-8"><div class="qs-step '+(hasDb?'done':'pending')+'" onclick="nav(\'dbmitra\')"><div class="qs-num">'+(hasDb?'<i class="fas fa-check"></i>':'1')+'</div><div class="qs-text"><div class="qs-title">Database Mitra</div><div class="qs-desc">'+(hasDb?S.dbMitra.length+' petugas terdaftar':'Kelola data petugas pendataan')+'</div></div><span class="qs-icon">'+(hasDb?'<i class="fas fa-check-circle text-green-500"></i>':'<span class="qs-arrow"><i class="fas fa-arrow-right"></i></span>')+'</span></div><div class="qs-step '+(hasPpk?'done':'pending')+'" onclick="nav(\'settings\')"><div class="qs-num">'+(hasPpk?'<i class="fas fa-check"></i>':'2')+'</div><div class="qs-text"><div class="qs-title">Pengaturan PPK</div><div class="qs-desc">'+(hasPpk?esc(S.set.ppkNama):'Isi data PPK dan BPS')+'</div></div><span class="qs-icon">'+(hasPpk?'<i class="fas fa-check-circle text-green-500"></i>':'<span class="qs-arrow"><i class="fas fa-arrow-right"></i></span>')+'</span></div><div class="qs-step '+(hasKon?'done':'pending')+'" onclick="nav(\'mitra\')"><div class="qs-num">'+(hasKon?'<i class="fas fa-check"></i>':'3')+'</div><div class="qs-text"><div class="qs-title">Buat Kontrak SE2026</div><div class="qs-desc">'+(hasKon?S.mitra.length+' kontrak dibuat':'Mulai buat kontrak PPL')+'</div></div><span class="qs-icon">'+(hasKon?'<i class="fas fa-check-circle text-green-500"></i>':'<span class="qs-arrow"><i class="fas fa-arrow-right"></i></span>')+'</span></div></div><div class="flex gap-3 justify-center flex-wrap"><button onclick="nav(\'settings\')" class="btn-p px-6 py-3 rounded-xl text-sm font-semibold"><i class="fas fa-cog mr-2"></i>Mulai dari Pengaturan</button><button onclick="loadSample()" class="btn-g px-6 py-3 rounded-xl text-sm font-medium"><i class="fas fa-database mr-2"></i>Muat Data Contoh</button></div></div></div></div>'}
 const dist=getMonthDist();const maxC=Math.max(1,Math.max.apply(null,dist.map(function(d){return d.count})));const chartHTML=dist.map(function(d){const pct=Math.round(d.count/maxC*100);const hasData=d.count>0;return'<div class="flex items-center gap-3"><span class="text-[11px] text-gray-500 w-16 text-right font-medium shrink-0">'+BL[d.bulan].substring(0,3)+'</span><div class="flex-1 bg-cool-100 rounded-lg h-7 overflow-hidden relative"><div class="dist-bar '+(hasData?'bg-gradient-to-r from-blue-500 to-blue-400':'bg-cool-200')+'" style="width:'+Math.max(pct,hasData?8:0)+'%">'+(hasData?'<span class="dist-tip">'+d.count+'</span>':'')+'</div></div><span class="text-[11px] font-mono '+(hasData?'text-navy-700 font-bold':'text-gray-300')+' w-6 text-center shrink-0">'+(d.count||'-')+'</span></div>'}).join('');
-return'<div class="fade-in"><div class="hero-bg rounded-b-3xl px-4 sm:px-8 lg:px-10 pt-8 pb-16 mb-[-48px] relative z-10"><div class="hero-glow"></div><div class="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-10"><div class="hero-logo-ring shrink-0"><img src="https://z-cdn-media.chatglm.cn/files/b8bffa74-ccd7-43df-ac0a-7d38232e3901.png?auth_key=1872868863-b6cd966dc51a4c34aa738032b487a895-0-e6beed34fb7fb9a9650976366f590c26" alt="Logo BPS"></div><div class="text-center lg:text-left"><h2 class="text-white text-xl sm:text-2xl lg:text-3xl font-bold tracking-wide leading-tight">BADAN PUSAT STATISTIK</h2><p class="text-blue-300/70 text-sm sm:text-base font-semibold tracking-[0.2em] uppercase mt-0.5">Kota Pekanbaru</p><p class="text-gold-400/70 text-xs italic mt-1.5">Sensus Ekonomi 2026</p></div><div class="lg:ml-auto hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5"><div class="pulse-dot" style="background:#3b82f6"></div><span class="text-blue-200/60 text-xs">Sistem Kontrak Kerja SE2026</span></div></div><div class="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-8"><div class="glass p-4"><div class="g-icon bg-blue-500/20 text-blue-300 mb-3"><i class="fas fa-address-book"></i></div><p class="stat-num text-white">'+S.dbMitra.length+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">DB Mitra</p><p class="text-emerald-300/60 text-[9px] mt-0.5">'+dbAktif+' aktif</p></div><div class="glass p-4"><div class="g-icon bg-gold-500/20 text-gold-300 mb-3"><i class="fas fa-file-contract"></i></div><p class="stat-num text-white">'+tot+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">Kontrak</p></div><div class="glass p-4"><div class="g-icon bg-sky-500/20 text-sky-300 mb-3"><i class="fas fa-walking"></i></div><p class="stat-num text-white">'+pplC+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">PPL</p></div><div class="glass p-4"><div class="g-icon bg-amber-500/20 text-amber-300 mb-3"><i class="fas fa-building"></i></div><p class="stat-num text-white">'+ubC+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">PML</p></div><div class="glass p-4"><div class="g-icon bg-emerald-500/20 text-emerald-300 mb-3"><i class="fas fa-money-bill-wave"></i></div><p class="stat-num text-white text-base lg:text-lg">'+fRp(totalHonor)+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">Total Honor</p></div><div class="glass p-4"><div class="g-icon '+(dups.length?'bg-red-500/20 text-red-300':'bg-violet-500/20 text-violet-300')+' mb-3"><i class="fas '+(dups.length?'fa-exclamation-triangle':'fa-calendar-check')+'"></i></div><p class="stat-num text-white">'+dups.length+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">'+(dups.length?'Duplikat!':'OK')+'</p></div></div><div class="hero-wave"><svg viewBox="0 0 1440 36" preserveAspectRatio="none"><path d="M0,18 C240,36 480,0 720,18 C960,36 1200,0 1440,18 L1440,36 L0,36 Z" fill="#f0f4f8"/></svg></div></div><div class="relative z-20 px-0"><div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6"><div class="lg:col-span-3 bg-white rounded-2xl border border-cool-200 shadow-sm"><div class="px-5 py-3 border-b border-cool-200"><h3 class="font-semibold text-sm flex items-center gap-2"><i class="fas fa-chart-bar text-blue-500 text-xs"></i>Distribusi Kontrak per Bulan</h3></div><div class="p-5 space-y-2">'+chartHTML+'</div></div><div class="lg:col-span-2 space-y-6"><div class="bg-white rounded-2xl border border-cool-200 shadow-sm"><div class="px-5 py-3 border-b border-cool-200"><h3 class="font-semibold text-sm flex items-center gap-2"><i class="fas fa-user-tie text-gold-600 text-xs"></i>PPK</h3></div><div class="p-5">'+(S.set.ppkNama?'<p class="font-semibold text-sm">'+esc(S.set.ppkNama)+'</p><p class="text-xs text-gray-400 font-mono mt-1">'+esc(S.set.ppkNip||'-')+'</p><p class="text-xs text-gray-500 mt-2">'+esc(S.set.bpsNama)+'</p>':'<p class="text-sm text-gray-400 italic">Belum dikonfigurasi</p><button onclick="nav(\'settings\')" class="text-gold-600 text-xs font-medium hover:underline mt-2 inline-block"><i class="fas fa-cog mr-1"></i>Buka Pengaturan</button>')+'</div></div><div class="bg-gradient-to-br from-navy-900 to-navy-800 rounded-2xl p-5 text-white relative overflow:hidden"><div class="absolute inset-0" style="background-image:radial-gradient(circle,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:18px 18px"></div><div class="relative z-10"><p class="text-blue-300/60 text-[10px] uppercase tracking-widest font-semibold mb-2">Periode SE2026</p><p class="text-2xl font-bold">Juni – Agustus 2026</p><div class="mt-3 flex gap-4 text-xs"><div><span class="text-blue-300/40 block">TTD Default</span><span class="text-blue-200 font-medium">'+fTglShort(S.set.tglTandaTangan||'')+'</span></div><div><span class="text-blue-300/40 block">Selesai</span><span class="text-blue-200 font-medium">'+fTglShort(S.set.tglSelesai||'')+'</span></div></div><div class="mt-3 text-xs"><span class="text-blue-300/40 block">Honor Maks</span><span class="text-gold-400 font-semibold">'+fRp(S.set.honorMaks)+'</span></div><div class="mt-2 text-xs"><span class="text-blue-300/40 block">Pelatihan</span><span class="text-blue-200 font-medium">'+(S.set.jenisPelatihan||'Fullday')+' (Sanksi: '+fRp(SANKSI_CONFIG[S.set.jenisPelatihan]||0)+')</span></div></div></div></div></div></div></div>'}
+return'<div class="fade-in"><div class="hero-bg rounded-b-3xl px-4 sm:px-8 lg:px-10 pt-8 pb-16 mb-[-48px] relative z-10"><div class="hero-glow"></div><div class="relative z-10 flex flex-col lg:flex-row items-center gap-6 lg:gap-10"><div class="hero-logo-ring shrink-0"><img src="https://z-cdn-media.chatglm.cn/files/b8bffa74-ccd7-43df-ac0a-7d38232e3901.png?auth_key=1872868863-b6cd966dc51a4c34aa738032b487a895-0-e6beed34fb7fb9a9650976366f590c26" alt="Logo BPS"></div><div class="text-center lg:text-left"><h2 class="text-white text-xl sm:text-2xl lg:text-3xl font-bold tracking-wide leading-tight">BADAN PUSAT STATISTIK</h2><p class="text-blue-300/70 text-sm sm:text-base font-semibold tracking-[0.2em] uppercase mt-0.5">Kota Pekanbaru</p><p class="text-gold-400/70 text-xs italic mt-1.5">Sensus Ekonomi 2026</p></div><div class="lg:ml-auto hidden sm:flex items-center gap-2 bg-white/5 border border-white/10 rounded-xl px-4 py-2.5"><div class="pulse-dot" style="background:#3b82f6"></div><span class="text-blue-200/60 text-xs">Sistem Kontrak Kerja SE2026</span></div></div><div class="relative z-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mt-8"><div class="glass p-4"><div class="g-icon bg-blue-500/20 text-blue-300 mb-3"><i class="fas fa-address-book"></i></div><p class="stat-num text-white">'+S.dbMitra.length+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">DB Mitra</p><p class="text-emerald-300/60 text-[9px] mt-0.5">'+dbAktif+' aktif</p></div><div class="glass p-4"><div class="g-icon bg-gold-500/20 text-gold-300 mb-3"><i class="fas fa-file-contract"></i></div><p class="stat-num text-white">'+tot+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">Kontrak</p></div><div class="glass p-4"><div class="g-icon bg-sky-500/20 text-sky-300 mb-3"><i class="fas fa-walking"></i></div><p class="stat-num text-white">'+pplC+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">PPL</p></div><div class="glass p-4"><div class="g-icon bg-amber-500/20 text-amber-300 mb-3"><i class="fas fa-building"></i></div><p class="stat-num text-white">'+ubC+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">PML</p></div><div class="glass p-4"><div class="g-icon bg-emerald-500/20 text-emerald-300 mb-3"><i class="fas fa-money-bill-wave"></i></div><p class="stat-num text-white text-base lg:text-lg">'+fRp(totalHonor)+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">Total Honor</p></div><div class="glass p-4"><div class="g-icon '+(dups.length?'bg-red-500/20 text-red-300':'bg-violet-500/20 text-violet-300')+' mb-3"><i class="fas '+(dups.length?'fa-exclamation-triangle':'fa-calendar-check')+'"></i></div><p class="stat-num text-white">'+dups.length+'</p><p class="text-blue-200/50 text-[10px] mt-1.5 font-medium uppercase tracking-wider">'+(dups.length?'Duplikat!':'OK')+'</p></div></div><div class="hero-wave"><svg viewBox="0 0 1440 36" preserveAspectRatio="none"><path d="M0,18 C240,36 480,0 720,18 C960,36 1200,0 1440,18 L1440,36 L0,36 Z" fill="#f0f4f8"/></svg></div></div><div class="relative z-20 px-0"><div class="grid grid-cols-1 lg:grid-cols-5 gap-6 mb-6"><div class="lg:col-span-3 bg-white rounded-2xl border border-cool-200 shadow-sm"><div class="px-5 py-3 border-b border-cool-200"><h3 class="font-semibold text-sm flex items-center gap-2"><i class="fas fa-chart-bar text-blue-500 text-xs"></i>Distribusi Kontrak per Bulan</h3></div><div class="p-5 space-y-2">'+chartHTML+'</div></div><div class="lg:col-span-2 space-y-6"><div class="bg-white rounded-2xl border border-cool-200 shadow-sm"><div class="px-5 py-3 border-b border-cool-200"><h3 class="font-semibold text-sm flex items-center gap-2"><i class="fas fa-user-tie text-gold-600 text-xs"></i>PPK</h3></div><div class="p-5">'+(S.set.ppkNama?'<p class="font-semibold text-sm">'+esc(S.set.ppkNama)+'</p><p class="text-xs text-gray-400 font-mono mt-1">'+esc(S.set.ppkNip||'-')+'</p><p class="text-xs text-gray-500 mt-2">'+esc(S.set.bpsNama)+'</p>':'<p class="text-sm text-gray-400 italic">Belum dikonfigurasi</p><button onclick="nav(\'settings\')" class="text-gold-600 text-xs font-medium hover:underline mt-2 inline-block"><i class="fas fa-cog mr-1"></i>Buka Pengaturan</button>')+'</div></div><div class="bg-gradient-to-br from-navy-900 to-navy-800 rounded-2xl p-5 text-white relative overflow:hidden"><div class="absolute inset-0" style="background-image:radial-gradient(circle,rgba(255,255,255,0.03) 1px,transparent 1px);background-size:18px 18px"></div><div class="relative z-10"><p class="text-blue-300/60 text-[10px] uppercase tracking-widest font-semibold mb-2">Periode SE2026</p><p class="text-2xl font-bold">Juni – Agustus 2026</p><div class="mt-3 flex gap-4 text-xs"><div><span class="text-blue-300/40 block">TTD Default</span><span class="text-blue-200 font-medium">'+fTglShort(S.set.tglTandaTangan||'')+'</span></div><div><span class="text-blue-300/40 block">Selesai</span><span class="text-blue-200 font-medium">'+fTglShort(S.set.tglSelesai||'')+'</span></div></div><div class="mt-3 text-xs"><span class="text-blue-300/40 block">Honor Maks</span><span class="text-gold-400 font-semibold">'+fRp(S.set.honorMaks)+'</span></div><div class="mt-2 text-xs"><span class="text-blue-300/40 block">Pelatihan</span><span class="text-blue-200 font-medium">'+(S.set.jenisPelatihan||'Fullday')+' (Sanksi: '+fRp(effectiveSanksi)+')</span></div></div></div></div></div></div></div>'}
 function getMonthDist(){const dist=[];for(let i=0;i<12;i++)dist.push({bulan:i,count:0});S.mitra.forEach(function(m){const t=getMitraTglTT(m);if(t){const d=new Date(t);dist[d.getMonth()].count++}});return dist}
 
 let dbSearch='',dbStatus='all';
@@ -395,90 +399,42 @@ let _editId='';
 var _namaDropdownReady=false;
 
 function autoFillHonor(jenis){var honorEl=$('fHonor'),t1El=$('fNilaiT1'),t2El=$('fNilaiT2');if(!honorEl)return;var cfg=HONOR_CONFIG[jenis];if(!cfg)return;honorEl.value=cfg.totalHonor;if(t1El)t1El.value=cfg.nilaiTermin1;if(t2El)t2El.value=cfg.nilaiTermin2;[honorEl,t1El,t2El].forEach(function(el){if(!el)return;el.classList.remove('auto-fill-flash');void el.offsetWidth;el.classList.add('auto-fill-flash')});updHonorTerbilang();updNilaiTerbilang();updNilaiMatch()}
-function autoFillSanksi(){var sanksiEl=$('fSanksi');if(!sanksiEl)return;var jenisPelatihan=S.set.jenisPelatihan||'Fullday';var val=SANKSI_CONFIG[jenisPelatihan];if(val===undefined)val=0;sanksiEl.value=val;sanksiEl.classList.remove('auto-fill-flash');void sanksiEl.offsetWidth;sanksiEl.classList.add('auto-fill-flash');updSanksiTerbilang()}
+/* ===== autoFillSanksi: gunakan nilai manual jika ada, else dari config ===== */
+function autoFillSanksi(){var sanksiEl=$('fSanksi');if(!sanksiEl)return;var val=getEffectiveSanksi();sanksiEl.value=val;sanksiEl.classList.remove('auto-fill-flash');void sanksiEl.offsetWidth;sanksiEl.classList.add('auto-fill-flash');updSanksiTerbilang()}
 
 function onTglTTChange(){updTglPreview()}
 
 function getFormYM(){var fTT=$('fTT');if(!fTT)return'';return getYearMonth(fTT.value)}
 
-/* ============================================
-   rebuildNamaDropdown — hanya nama yang BELUM
-   punya kontrak yang muncul
-   ============================================ */
 function rebuildNamaDropdown(){
     var excludeId=_editId||'';
     var avail=getAvailableDbMitra(excludeId);
     var curVal=ssVal('ss-mitra-nm');
-
     var opts=[];
     avail.sort(function(a,b){return(a.nama||'').localeCompare(b.nama||'')});
-    avail.forEach(function(d){
-        opts.push({value:d.id,label:d.nama,extra:d.nik});
-    });
-
+    avail.forEach(function(d){opts.push({value:d.id,label:d.nama,extra:d.nik})});
     var newSel='';
-    if(curVal){
-        var stillValid=opts.some(function(o){return o.value===curVal});
-        newSel=stillValid?curVal:'';
-    }
-
-    var wrap=$('ss-ss-mitra-nm');
-    if(!wrap)return;
-
+    if(curVal){var stillValid=opts.some(function(o){return o.value===curVal});newSel=stillValid?curVal:''}
+    var wrap=$('ss-ss-mitra-nm');if(!wrap)return;
     var isDisabled=opts.length===0;
     var selOpt=opts.find(function(o){return o.value===newSel&&!o.hidden});
     var dt=selOpt?selOpt.label:(isDisabled?'Tidak ada pilihan':'-- Pilih Mitra dari Database --');
-    var isPh=!selOpt;
-    var disCls=isDisabled?' ss-disabled':'';
-
+    var isPh=!selOpt;var disCls=isDisabled?' ss-disabled':'';
     var newHTML='<div class="ss-trigger" onclick="'+(isDisabled?'':'ssToggle(\'ss-mitra-nm\')')+'"><span class="ss-display'+(isPh?' ph':'')+'">'+esc(dt)+'</span><i class="fas fa-chevron-down ss-arrow"></i></div>'
     +'<div class="ss-panel" id="ssp-ss-mitra-nm"><div class="ss-search"><i class="fas fa-search"></i><input type="text" placeholder="Ketik untuk mencari..." oninput="ssFilter(\'ss-mitra-nm\',this.value)" onkeydown="ssKeyNav(event,\'ss-mitra-nm\')"></div>'
     +'<div class="ss-list" id="ssl-ss-mitra-nm">';
-    if(opts.length===0){
-        newHTML+='<div class="ss-nores"><i class="fas fa-user-slash"></i>Tidak ada nama tersedia</div>';
-    }else{
-        opts.forEach(function(o){
-            var cls=(o.value===newSel?' active':'');
-            newHTML+='<div class="ss-opt'+cls+'" data-val="'+esc(o.value)+'" onmousedown="ssPick(\'ss-mitra-nm\',this.dataset.val)"><span class="ss-ol">'+esc(o.label)+'</span>';
-            if(o.extra)newHTML+='<span class="ss-oe">'+esc(o.extra)+'</span>';
-            newHTML+='</div>';
-        });
-    }
+    if(opts.length===0){newHTML+='<div class="ss-nores"><i class="fas fa-user-slash"></i>Tidak ada nama tersedia</div>'}
+    else{opts.forEach(function(o){var cls=(o.value===newSel?' active':'');newHTML+='<div class="ss-opt'+cls+'" data-val="'+esc(o.value)+'" onmousedown="ssPick(\'ss-mitra-nm\',this.dataset.val)"><span class="ss-ol">'+esc(o.label)+'</span>';if(o.extra)newHTML+='<span class="ss-oe">'+esc(o.extra)+'</span>';newHTML+='</div>'})}
     newHTML+='</div></div>';
-
-    wrap.innerHTML=newHTML;
-    wrap.className='ss-wrap'+disCls;
-
-    if(newSel){
-        var d=S.dbMitra.find(function(x){return x.id===newSel});
-        if(d){
-            var ni=$('fNik'),tl=$('fTlp'),al=$('fAl');
-            if(ni){ni.value=d.nik;setRO(ni,true)}
-            if(tl){tl.value=d.noHp||'';setRO(tl,true)}
-            if(al){al.value=d.alamat;setRO(al,true)}
-        }
-    }else{
-        var ni2=$('fNik'),tl2=$('fTlp'),al2=$('fAl');
-        if(ni2){ni2.value='';setRO(ni2,false)}
-        if(tl2){tl2.value='';setRO(tl2,false)}
-        if(al2){al2.value='';setRO(al2,false)}
-    }
+    wrap.innerHTML=newHTML;wrap.className='ss-wrap'+disCls;
+    if(newSel){var d=S.dbMitra.find(function(x){return x.id===newSel});if(d){var ni=$('fNik'),tl=$('fTlp'),al=$('fAl');if(ni){ni.value=d.nik;setRO(ni,true)}if(tl){tl.value=d.noHp||'';setRO(tl,true)}if(al){al.value=d.alamat;setRO(al,true)}}}
+    else{var ni2=$('fNik'),tl2=$('fTlp'),al2=$('fAl');if(ni2){ni2.value='';setRO(ni2,false)}if(tl2){tl2.value='';setRO(tl2,false)}if(al2){al2.value='';setRO(al2,false)}}
 }
 
 function handleNamaSelect(val){
     var ni=$('fNik'),tl=$('fTlp'),al=$('fAl');
-    if(val){
-        var d=S.dbMitra.find(function(x){return x.id===val});
-        if(d){
-            if(ni){ni.value=d.nik;setRO(ni,true)}
-            if(tl){tl.value=d.noHp||'';setRO(tl,true)}
-            if(al){al.value=d.alamat;setRO(al,true)}
-        }
-    }else{
-        if(ni){ni.value='';setRO(ni,false)}
-        if(tl){tl.value='';setRO(tl,false)}
-        if(al){al.value='';setRO(al,false)}
-    }
+    if(val){var d=S.dbMitra.find(function(x){return x.id===val});if(d){if(ni){ni.value=d.nik;setRO(ni,true)}if(tl){tl.value=d.noHp||'';setRO(tl,true)}if(al){al.value=d.alamat;setRO(al,true)}}}
+    else{if(ni){ni.value='';setRO(ni,false)}if(tl){tl.value='';setRO(tl,false)}if(al){al.value='';setRO(al,false)}}
 }
 function handleJenisSelect(val){updTglPreview();autoFillHonor(val)}
 function setRO(el,ro){if(!el)return;if(ro){el.setAttribute('readonly','');el.classList.add('fg-ro')}else{el.removeAttribute('readonly');el.classList.remove('fg-ro')}}
@@ -494,65 +450,39 @@ function updTglPreview(){
     if(dupWarn){if(preview.isDup){dupWarn.style.display='block';dupWarn.innerHTML='<div class="dup-warn-bar"><i class="fas fa-exclamation-triangle"></i><span><b>Duplikat!</b> Sudah dipakai oleh <b>'+esc(preview.conflictWith)+'</b>.</span></div>'}else dupWarn.style.display='none'}
     updTglChipsOnly();
 }
-function updTglChipsOnly(){var fTT=$('fTT')?$('fTT').value:'';var fTS=$('fTS')?$('fTS').value:'';var useTT=fTT||S.set.tglTandaTangan||'';var useSelesai=fTS||S.set.tglSelesai||'';var jp=ssVal('ss-jenis-petugas')||'PPL';var infoText='';if(jp==='PML')infoText='<span class="tgl-chip from-custom"><i class="fas fa-building" style="font-size:8px"></i>PML</span> Termin I: 15 Juni – 16 Juli · Termin II: 16 Juli – 31 Agustus';else infoText='<span class="tgl-chip from-custom"><i class="fas fa-walking" style="font-size:8px"></i>PPL</span> Termin I: 15 Juni – 16 Juli · Termin II: 16 Juli – 31 Agustus';var pelatihanLbl=S.set.jenisPelatihan||'Fullday';var pelatihanSanksi=fRp(SANKSI_CONFIG[pelatihanLbl]||0);infoText+='<span style="font-size:10px;color:#cbd5e1">|</span><span class="tgl-chip from-custom"><i class="fas fa-graduation-cap" style="font-size:8px"></i>'+pelatihanLbl+' (Sanksi: '+pelatihanSanksi+')</span>';var el=$('tglPreview');if(!el)return;el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'+infoText+(useTT?'<span style="font-size:10px;color:#cbd5e1">|</span><span class="tgl-chip from-custom"><i class="fas fa-calendar-day" style="font-size:8px"></i>TTD: '+fTglShort(useTT)+'</span>':'')+(useSelesai?'<span style="font-size:10px;color:#cbd5e1">|</span><span class="tgl-chip from-custom"><i class="fas fa-flag-checkered" style="font-size:8px"></i>Selesai: '+fTglShort(useSelesai)+'</span>':'')+((!fTT&&!fTS)?'<span class="snap-badge" style="margin-left:2px"><i class="fas fa-camera"></i>Akan snapshot dari global</span>':'<span class="snap-badge" style="margin-left:2px;background:#fef3c7;border-color:#fde68a;color:#92400e"><i class="fas fa-lock"></i>Custom</span>')+'</div>'}
+function updTglChipsOnly(){var fTT=$('fTT')?$('fTT').value:'';var fTS=$('fTS')?$('fTS').value:'';var useTT=fTT||S.set.tglTandaTangan||'';var useSelesai=fTS||S.set.tglSelesai||'';var jp=ssVal('ss-jenis-petugas')||'PPL';var infoText='';if(jp==='PML')infoText='<span class="tgl-chip from-custom"><i class="fas fa-building" style="font-size:8px"></i>PML</span> Termin I: 15 Juni – 16 Juli · Termin II: 16 Juli – 31 Agustus';else infoText='<span class="tgl-chip from-custom"><i class="fas fa-walking" style="font-size:8px"></i>PPL</span> Termin I: 15 Juni – 16 Juli · Termin II: 16 Juli – 31 Agustus';var pelatihanLbl=S.set.jenisPelatihan||'Fullday';var effectiveSanksi=getEffectiveSanksi();var pelatihanSanksi=fRp(effectiveSanksi);infoText+='<span style="font-size:10px;color:#cbd5e1">|</span><span class="tgl-chip from-custom"><i class="fas fa-graduation-cap" style="font-size:8px"></i>'+pelatihanLbl+' (Sanksi: '+pelatihanSanksi+')</span>';var el=$('tglPreview');if(!el)return;el.innerHTML='<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center">'+infoText+(useTT?'<span style="font-size:10px;color:#cbd5e1">|</span><span class="tgl-chip from-custom"><i class="fas fa-calendar-day" style="font-size:8px"></i>TTD: '+fTglShort(useTT)+'</span>':'')+(useSelesai?'<span style="font-size:10px;color:#cbd5e1">|</span><span class="tgl-chip from-custom"><i class="fas fa-flag-checkered" style="font-size:8px"></i>Selesai: '+fTglShort(useSelesai)+'</span>':'')+((!fTT&&!fTS)?'<span class="snap-badge" style="margin-left:2px"><i class="fas fa-camera"></i>Akan snapshot dari global</span>':'<span class="snap-badge" style="margin-left:2px;background:#fef3c7;border-color:#fde68a;color:#92400e"><i class="fas fa-lock"></i>Custom</span>')+'</div>'}
 
 function addSingle(){
     if(!S.set.ppkNama)return toast('Isi pengaturan PPK/BPS dulu','warning');
     if(!S.set.jenisPelatihan)return toast('Isi jenis pelatihan di Pengaturan dulu','warning');
-    _editId='';
-    _namaDropdownReady=false;
-    var emptyM={id:'',nama:'',nik:'',alamat:'',noTelepon:'',tglTandaTangan:'',tglSelesai:'',jenisPetugas:'PPL',jenisPelatihan:S.set.jenisPelatihan,totalHonor:0,sanksiPelatihan:SANKSI_CONFIG[S.set.jenisPelatihan]||0,nilaiTermin1:0,nilaiTermin2:0,lampVol1:'',lampSat1:DEFAULT_SATUAN[0],lampVol2:'',lampSat2:DEFAULT_SATUAN[1],lampVol3:'',lampSat3:DEFAULT_SATUAN[2],lampVol4:'',lampSat4:DEFAULT_SATUAN[3]};
+    _editId='';_namaDropdownReady=false;
+    var emptyM={id:'',nama:'',nik:'',alamat:'',noTelepon:'',tglTandaTangan:'',tglSelesai:'',jenisPetugas:'PPL',jenisPelatihan:S.set.jenisPelatihan,totalHonor:0,sanksiPelatihan:getEffectiveSanksi(),nilaiTermin1:0,nilaiTermin2:0,lampVol1:'',lampSat1:DEFAULT_SATUAN[0],lampVol2:'',lampSat2:DEFAULT_SATUAN[1],lampVol3:'',lampSat3:DEFAULT_SATUAN[2],lampVol4:'',lampSat4:DEFAULT_SATUAN[3]};
     oM('<i class="fas fa-plus-circle text-gold-500 mr-2"></i>Tambah Kontrak SE2026',mitraFormHTML(emptyM,false),false,'');
-    setTimeout(function(){
-        ssInit('ss-mitra-nm',handleNamaSelect);
-        ssInit('ss-jenis-petugas',handleJenisSelect);
-        updTglPreview();
-        autoFillHonor('PPL');
-        autoFillSanksi();
-        _namaDropdownReady=true;
-        rebuildNamaDropdown();
-    },80);
+    setTimeout(function(){ssInit('ss-mitra-nm',handleNamaSelect);ssInit('ss-jenis-petugas',handleJenisSelect);updTglPreview();autoFillHonor('PPL');autoFillSanksi();_namaDropdownReady=true;rebuildNamaDropdown()},80);
 }
 function findDbMitraByNama(nama){if(!nama)return null;return S.dbMitra.find(function(d){return d.nama.toLowerCase()===nama.toLowerCase()&&d.aktif!==false})||null}
 
-/* ============================================================
-   mitraFormHTML — TANPA dropdown jenis pelatihan,
-   SATUAN DEFAULT: SLS/SUB SLS, Rangkap, SLS/SUB SLS, Rangkap
-   ============================================================ */
 function mitraFormHTML(m,isEdit){
     var excludeId=isEdit?m.id:'';
     var avail=getAvailableDbMitra(excludeId);
     var dbMatch=findDbMitraByNama(m.nama);
     var namaOpts=[],selVal='';
     avail.sort(function(a,b){return(a.nama||'').localeCompare(b.nama||'')});
-    avail.forEach(function(d){
-        if(dbMatch&&d.id===dbMatch.id)selVal=d.id;
-        namaOpts.push({value:d.id,label:d.nama,extra:d.nik});
-    });
-
+    avail.forEach(function(d){if(dbMatch&&d.id===dbMatch.id)selVal=d.id;namaOpts.push({value:d.id,label:d.nama,extra:d.nik})});
     var isLocked=!!isEdit&&m.nomorKontrak;
     var nkHTML='';
     if(isLocked)nkHTML='<div class="nk-compact locked" id="fNKPreview"><span class="nk-label"><i class="fas fa-lock" style="font-size:8px;margin-right:2px"></i>Nomor (Tetap)</span><span id="fNKText">'+esc(m.nomorKontrak)+'</span><i class="fas fa-lock" style="color:#64748b"></i></div><div id="fNKDupWarn" style="display:none"></div>';
     else nkHTML='<div class="nk-compact" id="fNKPreview"><span class="nk-label">Nomor Kontrak</span><span id="fNKText">'+getNomorPreview(m.tglTandaTangan||S.set.tglTandaTangan||'','').nomor+'</span><i class="fas fa-check-circle"></i></div><div id="fNKDupWarn" style="display:none"></div>';
     var jenisOpts=[{value:'PPL',label:'PPL',extra:'Pendataan Lapangan'},{value:'PML',label:'PML',extra:'Pengawas Lapangan'}];
-
-    /* Satuan default: SLS/SUB SLS, Rangkap, SLS/SUB SLS, Rangkap */
-    var sat1=m.lampSat1||DEFAULT_SATUAN[0];
-    var sat2=m.lampSat2||DEFAULT_SATUAN[1];
-    var sat3=m.lampSat3||DEFAULT_SATUAN[2];
-    var sat4=m.lampSat4||DEFAULT_SATUAN[3];
-
-    var lampRowsData=[
-        {n:'1',cls:'r1',tugas:'Pendataan Lapangan Termin 1 (40%)',volId:'fLampVol1',satId:'fLampSat1',vol:m.lampVol1||'',sat:sat1},
-        {n:'2',cls:'r2',tugas:'Kelengkapan Dokumen',volId:'fLampVol2',satId:'fLampSat2',vol:m.lampVol2||'',sat:sat2},
-        {n:'3',cls:'r3',tugas:'Pendataan Lapangan 100%',volId:'fLampVol3',satId:'fLampSat3',vol:m.lampVol3||'',sat:sat3},
-        {n:'4',cls:'r4',tugas:'Kelengkapan Dokumen Tahap 2',volId:'fLampVol4',satId:'fLampSat4',vol:m.lampVol4||'',sat:sat4}
-    ];
+    var sat1=m.lampSat1||DEFAULT_SATUAN[0],sat2=m.lampSat2||DEFAULT_SATUAN[1],sat3=m.lampSat3||DEFAULT_SATUAN[2],sat4=m.lampSat4||DEFAULT_SATUAN[3];
+    var lampRowsData=[{n:'1',cls:'r1',tugas:'Pendataan Lapangan Termin 1 (40%)',volId:'fLampVol1',satId:'fLampSat1',vol:m.lampVol1||'',sat:sat1},{n:'2',cls:'r2',tugas:'Kelengkapan Dokumen',volId:'fLampVol2',satId:'fLampSat2',vol:m.lampVol2||'',sat:sat2},{n:'3',cls:'r3',tugas:'Pendataan Lapangan 100%',volId:'fLampVol3',satId:'fLampSat3',vol:m.lampVol3||'',sat:sat3},{n:'4',cls:'r4',tugas:'Kelengkapan Dokumen Tahap 2',volId:'fLampVol4',satId:'fLampSat4',vol:m.lampVol4||'',sat:sat4}];
     var lampFormRows=lampRowsData.map(function(r){return'<div class="lamp-row-form"><div class="lamp-row-num '+r.cls+'">'+r.n+'</div><div class="lamp-row-tugas">'+esc(r.tugas)+'</div><input id="'+r.volId+'" type="text" value="'+esc(r.vol)+'" class="lrf-input" placeholder="Volume"><input id="'+r.satId+'" type="text" value="'+esc(r.sat)+'" class="lrf-input" placeholder="Satuan"></div>'}).join('');
     var honorInfoHTML='<div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-800 flex items-start gap-2 mb-3"><i class="fas fa-magic mt-0.5 flex-shrink-0"></i><div><strong>Auto-fill aktif:</strong> Nilai honorarium & termin diisi otomatis sesuai jenis petugas. <b>PPL</b> = '+fRp(HONOR_CONFIG.PPL.totalHonor)+' (T1: '+fRp(HONOR_CONFIG.PPL.nilaiTermin1)+' + T2: '+fRp(HONOR_CONFIG.PPL.nilaiTermin2)+') · <b>PML</b> = '+fRp(HONOR_CONFIG.PML.totalHonor)+' (T1: '+fRp(HONOR_CONFIG.PML.nilaiTermin1)+' + T2: '+fRp(HONOR_CONFIG.PML.nilaiTermin2)+'). Nilai tetap bisa diedit manual.</div></div>';
     var pelatihanLbl=S.set.jenisPelatihan||'Fullday';
-    var pelatihanSanksi=fRp(SANKSI_CONFIG[pelatihanLbl]||0);
-    var sanksiInfoHTML='<div class="bg-rose-50 border border-rose-200 rounded-lg p-3 text-xs text-rose-800 flex items-start gap-2 mb-3"><i class="fas fa-graduation-cap mt-0.5 flex-shrink-0"></i><div><strong>Sanksi dari Pengaturan:</strong> Jenis pelatihan saat ini adalah <b>'+pelatihanLbl+'</b> dengan sanksi <b>'+pelatihanSanksi+'</b>. Ubah di halaman <b>Pengaturan</b> jika perlu. Nilai sanksi di bawah tetap bisa diedit manual.</div></div>';
+    var effectiveSanksi=getEffectiveSanksi();
+    var pelatihanSanksi=fRp(effectiveSanksi);
+    var isCustomSanksi=S.set.sanksiNilai!==undefined&&S.set.sanksiNilai!==null&&S.set.sanksiNilai!==''&&Number(S.set.sanksiNilai)!==SANKSI_CONFIG[pelatihanLbl];
+    var sanksiNote=isCustomSanksi?'<div class="bg-blue-50 border border-blue-200 rounded-lg p-3 text-xs text-blue-800 flex items-start gap-2 mb-3"><i class="fas fa-pen-to-square mt-0.5 flex-shrink-0"></i><div><strong>Nilai kustom:</strong> Sanksi pelatihan saat ini <b>'+fRp(effectiveSanksi)+'</b> (berbeda dari default '+fRp(SANKSI_CONFIG[pelatihanLbl])+' untuk '+pelatihanLbl+'). Nilai tetap bisa diedit manual di bawah.</div></div>':'<div class="bg-rose-50 border border-rose-200 rounded-lg p<div><strong>Sanksi dari Pengaturan:</strong> Jenis pelatihan saat ini adalah <b>'+pelatihanLbl+'</b> dengan sanksi <b>'+pelatihanSanksi+'</b>. Ubah di halaman <b>Pengaturan</b> jika perlu. Nilai sanksi di bawah tetap bisa diedit manual.</div></div>';
 
     var namaDisabled=namaOpts.length===0;
     var namaPh=namaDisabled?'Tidak ada pilihan':'Pilih Mitra dari Database';
@@ -580,7 +510,7 @@ function mitraFormHTML(m,isEdit){
     +'<div class="f-row f-row-2" style="margin-bottom:8px"><div class="fg"><label class="fg-label">Total Honorarium (Rp)<span class="req">*</span></label><input id="fHonor" type="number" value="'+(m.totalHonor||'')+'" min="0" class="fg-input font-mono" oninput="updHonorTerbilang();updNilaiMatch()" placeholder="Contoh: 1500000"><div class="fg-hint">Termasuk pajak, bea meterai, jasa pelayanan keuangan</div><div id="honorTerbilang" class="text-xs text-gray-500 mt-1 font-medium italic">'+(m.totalHonor?terbilang(m.totalHonor)+' rupiah':'')+'</div></div><div></div></div>'
     +'<div id="nilaiMatchHint" style="margin-bottom:8px"></div></div></div>'
     +'<div class="f-section"><div class="f-section-hd"><i class="fas fa-graduation-cap shd-rose"></i>Sanksi Pelatihan</div><div class="f-section-bd">'
-    +sanksiInfoHTML
+    +sanksiNote
     +'<div class="f-row f-row-2" style="margin-bottom:8px"><div class="fg"><label class="fg-label">Sanksi Pelatihan (Rp)<span class="req">*</span></label><input id="fSanksi" type="number" value="'+(m.sanksiPelatihan||'')+'" min="0" class="fg-input font-mono" oninput="updSanksiTerbilang()" placeholder="Otomatis dari pengaturan"><div id="sanksiTerbilang" class="text-xs text-gray-500 mt-1 font-medium italic">'+(m.sanksiPelatihan?terbilang(m.sanksiPelatihan)+' rupiah':'')+'</div></div><div></div></div></div></div>'
     +'<div class="f-section"><div class="f-section-hd"><i class="fas fa-table shd-orange"></i>Nilai Perjanjian — Lampiran (Hal. 5)</div><div class="f-section-bd">'
     +'<div class="bg-orange-50 border border-orange-200 rounded-lg p-3 text-xs text-orange-800 mb-3 flex items-start gap-2"><i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i><div><strong>Kolom 6 lampiran:</strong> Isi nilai rupiah untuk baris 1 (Termin I) dan baris 3 (Termin II). Total kedua nilai akan otomatis dihitung di footer tabel lampiran. Sebaiknya jumlahnya sama dengan Total Honorarium di atas.</div></div>'
@@ -632,14 +562,59 @@ function saveMitra(editId){
 function editM(id){var m=S.mitra.find(function(x){return x.id===id});if(!m)return;_editId=id;_namaDropdownReady=false;oM('<i class="fas fa-pen text-amber-500 mr-2"></i>Edit Kontrak SE2026',mitraFormHTML(m,true),true,id);setTimeout(function(){ssInit('ss-mitra-nm',handleNamaSelect);ssInit('ss-jenis-petugas',handleJenisSelect);updTglPreview();updHonorTerbilang();updSanksiTerbilang();updNilaiTerbilang();updNilaiMatch();_namaDropdownReady=true;rebuildNamaDropdown()},80)}
 function delM(id){var m=S.mitra.find(function(x){return x.id===id});if(!m)return;oCf('Hapus Kontrak','"'+m.nama+'" ('+m.nomorKontrak+') akan dihapus.',function(){S.mitra=S.mitra.filter(function(x){return x.id!==id});regenAllNomor();aSave();render();toast('Kontrak berhasil dihapus')})}
 
-/* ============================================================
-   rSettings — DENGAN Jenis Pelatihan
-   ============================================================ */
-function rSettings(){var s=S.set;var pelatihanOpts=[{value:'Fullday',label:'Fullday',extra:fRp(SANKSI_CONFIG.Fullday)},{value:'Fullboard',label:'Fullboard',extra:fRp(SANKSI_CONFIG.Fullboard)}];return'<div class="fade-in max-w-3xl mx-auto"><div class="mb-6"><h2 class="text-2xl font-bold">Pengaturan</h2><p class="text-gray-500 text-sm mt-1">Konfigurasi PPK/BPS untuk SE2026</p></div><div class="bg-white rounded-2xl border border-cool-200 shadow-sm p-6 space-y-6"><div class="bg-blue-50 rounded-xl p-4 text-sm text-blue-800 flex items-start gap-3"><i class="fas fa-info-circle mt-0.5"></i><div><strong>Format nomor:</strong> MMDDNNN/PPK/SE2026/YYYY — YYYY diambil dari <b>tahun TTD</b>. Nomor kontrak yang sudah dibuat <b>tidak berubah</b>.</div></div><div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-landmark"></i> Pejabat Pembuat Komitmen</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Nama PPK <span class="text-red-400">*</span></label><input id="sPpkNm" type="text" value="'+esc(s.ppkNama)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm" placeholder="Dr. Ahmad Fauzi, M.Si"></div><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">NIP <span class="text-red-400">*</span></label><input id="sPpkNip" type="text" value="'+esc(s.ppkNip)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm font-mono" placeholder="19800101 201001 1 001"></div></div></div><div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-building"></i> Informasi BPS</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Nama BPS <span class="text-red-400">*</span></label><input id="sBpsNm" type="text" value="'+esc(s.bpsNama)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Alamat BPS <span class="text-red-400">*</span></label><input id="sBpsAl" type="text" value="'+esc(s.bpsAlamat)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Kota <span class="text-red-400">*</span></label><input id="sKota" type="text" value="'+esc(s.kota)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div></div></div><div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-graduation-cap"></i> Jenis Pelatihan</h3><div class="bg-rose-50 border border-rose-200 rounded-lg p-3 text-xs text-rose-800 mb-4 flex items-start gap-2"><i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i><div><strong>Pengaturan global:</strong> Jenis pelatihan yang dipilih di sini akan otomatis diterapkan ke semua kontrak baru. Sanksi pelatihan dihitung berdasarkan pilihan ini: <b>Fullday</b> = '+fRp(SANKSI_CONFIG.Fullday)+' · <b>Fullboard</b> = '+fRp(SANKSI_CONFIG.Fullboard)+'. Mengubah ini <b>tidak mengubah</b> kontrak yang sudah dibuat.</div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-xs font-medium text-gray-500 mb-1">Jenis Pelatihan <span class="text-red-400">*</span></label><div id="ss-pelatihan-setting">'+ssHTML('ss-pelatihan-setting',pelatihanOpts,s.jenisPelatihan||'Fullday','Pilih jenis pelatihan...')+'</div><div class="fg-hint" style="margin-top:4px"><i class="fas fa-shield-alt text-blue-400"></i>Diterapkan ke semua kontrak baru</div></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Sanksi Otomatis</label><div class="px-3 py-2.5 rounded-xl border border-cool-200 bg-cool-50 font-mono font-bold text-sm text-navy-700" id="sSanksiPreview">'+fRp(SANKSI_CONFIG[s.jenisPelatihan]||0)+'</div><div class="fg-hint" style="margin-top:2px"><i class="fas fa-calculator text-green-400"></i>Dihitung dari jenis pelatihan</div></div></div></div><div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-calendar-alt"></i> Tanggal Default SE2026</h3><div class="bg-amber-50 rounded-xl p-3 text-xs text-amber-800 mb-4 flex items-start gap-2"><i class="fas fa-shield-alt mt-0.5"></i><div><strong>Snapshot:</strong> Tanggal dikunci ke data kontrak saat disimpan. Mengubah di sini <b>tidak mengubah</b> kontrak lama.</div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-xs font-medium text-gray-500 mb-1">Honor Maksimal (Rp) <span class="text-red-400">*</span></label><input id="sHonor" type="number" value="'+s.honorMaks+'" min="0" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm font-mono"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Tgl TTD Default</label><input id="sTgl" type="date" value="'+s.tglTandaTangan+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm">'+(s.tglTandaTangan?'<div class="fg-hint" style="margin-top:2px"><i class="fas fa-calendar-check text-green-400"></i>'+fTglShort(s.tglTandaTangan)+'</div>':'<div class="fg-hint" style="margin-top:2px"><i class="fas fa-exclamation-circle text-amber-400"></i>Belum diisi</div>')+'</div><div><label class="block text-xs font-medium text-gray-500 mb-1">Tgl Selesai Default</label><input id="sTglSelesai" type="date" value="'+s.tglSelesai+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"><div class="fg-hint" style="margin-top:2px"><i class="fas '+(s.tglSelesai?'fa-lock text-green-400':'fa-magic text-blue-400')+'"></i>'+(s.tglSelesai?'Manual: '+fTglShort(s.tglSelesai):'Kosongkan = 31 Agustus 2026')+'</div></div></div><div class="bg-gradient-to-br from-navy-900 to-navy-800 rounded-xl p-4 text-white mt-4"><div class="flex flex-wrap gap-6 text-xs"><div><span class="text-blue-300/50 block mb-1">PERIODE SE2026</span><span class="text-lg font-bold">Juni – Agustus 2026</span></div><div><span class="text-blue-300/50 block mb-1">TTD DEFAULT</span><span class="text-blue-200 font-medium">'+fTglShort(s.tglTandaTangan||'-')+'</span></div><div><span class="text-blue-300/50 block mb-1">SELESAI</span><span class="text-blue-200 font-medium">'+fTglShort(s.tglSelesai||'31 Agustus 2026')+'</span></div><div><span class="text-blue-300/50 block mb-1">HONOR MAKS</span><span class="text-gold-400 font-semibold">'+fRp(s.honorMaks)+'</span></div><div><span class="text-blue-300/50 block mb-1">PELATIHAN</span><span class="text-blue-200 font-medium">'+(s.jenisPelatihan||'Fullday')+'</span></div><div><span class="text-blue-300/50 block mb-1">SANKSI</span><span class="text-rose-300 font-semibold">'+fRp(SANKSI_CONFIG[s.jenisPelatihan]||0)+'</span></div></div></div></div><div class="flex justify-end"><button onclick="saveSettings()" class="btn-p px-8 py-3 rounded-xl text-sm font-semibold"><i class="fas fa-save mr-2"></i>Simpan Pengaturan</button></div></div></div>'}
+/* ===== rSettings — DENGAN input sanksi yang bisa diedit ===== */
+function rSettings(){
+    var s=S.set;
+    var pelatihanOpts=[{value:'Fullday',label:'Fullday',extra:fRp(SANKSI_CONFIG.Fullday)},{value:'Fullboard',label:'Fullboard',extra:fRp(SANKSI_CONFIG.Fullboard)}];
+    var currentJenis=s.jenisPelatihan||'Fullday';
+    var defaultSanksi=SANKSI_CONFIG[currentJenis]||0;
+    var effectiveSanksi=getEffectiveSanksi();
+    var isCustom=S.set.sanksiNilai!==undefined&&S.set.sanksiNilai!==null&&S.set.sanksiNilai!==''&&Number(S.set.sanksiNilai)!==defaultSanksi;
+
+    return'<div class="fade-in max-w-3xl mx-auto"><div class="mb-6"><h2 class="text-2xl font-bold">Pengaturan</h2><p class="text-gray-500 text-sm mt-1">Konfigurasi PPK/BPS untuk SE2026</p></div><div class="bg-white rounded-2xl border border-cool-200 shadow-sm p-6 space-y-6"><div class="bg-blue-50 rounded-xl p-4 text-sm text-blue-800 flex items-start gap-3"><i class="fas fa-info-circle mt-0.5"></i><div><strong>Format nomor:</strong> MMDDNNN/PPK/SE2026/YYYY — YYYY diambil dari <b>tahun TTD</b>. Nomor kontrak yang sudah dibuat <b>tidak berubah</b>.</div></div><div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-landmark"></i> Pejabat Pembuat Komitmen</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Nama PPK <span class="text-red-400">*</span></label><input id="sPpkNm" type="text" value="'+esc(s.ppkNama)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm" placeholder="Dr. Ahmad Fauzi, M.Si"></div><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">NIP <span class="text-red-400">*</span></label><input id="sPpkNip" type="text" value="'+esc(s.ppkNip)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm font-mono" placeholder="19800101 201001 1 001"></div></div></div><div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-building"></i> Informasi BPS</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Nama BPS <span class="text-red-400">*</span></label><input id="sBpsNm" type="text" value="'+esc(s.bpsNama)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div><div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Alamat BPS <span class="text-red-400">*</span></label><input id="sBpsAl" type="text" value="'+esc(s.bpsAlamat)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Kota <span class="text-red-400">*</span></label><input id="sKota" type="text" value="'+esc(s.kota)+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"></div></div></div>'
+    +'<div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-graduation-cap"></i> Jenis Pelatihan & Sanksi</h3>'
+    +'<div class="bg-rose-50 border border-rose-200 rounded-lg p-3 text-xs text-rose-800 mb-4 flex items-start gap-2"><i class="fas fa-info-circle mt-0.5 flex-shrink-0"></i><div><strong>Pengaturan sanksi:</strong> Pilih jenis pelatihan, lalu nilai sanksi otomatis terisi sesuai default. Kamu bisa <b>mengedit angka sanksi secara manual</b> di kolom "Sanksi Kustom" di bawah. Jika kolom dikosongkan, sistem akan menggunakan nilai default berdasarkan jenis pelatihan: <b>Fullday</b> = '+fRp(SANKSI_CONFIG.Fullday)+' · <b>Fullboard</b> = '+fRp(SANKSI_CONFIG.Fullboard)+'. Nilai sanksi ini diterapkan ke <b>kontrak baru</b> saja.</div></div>'
+    +'<div class="grid grid-cols-1 md:grid-cols-2 gap-4">'
+    +'<div><label class="block text-xs font-medium text-gray-500 mb-1">Jenis Pelatihan <span class="text-red-400">*</span></label><div id="ss-pelatihan-setting">'+ssHTML('ss-pelatihan-setting',pelatihanOpts,currentJenis,'Pilih jenis pelatihan...')+'</div><div class="fg-hint" style="margin-top:4px"><i class="fas fa-shield-alt text-blue-400"></i>Diterapkan ke semua kontrak baru</div></div>'
+    +'<div><label class="block text-xs font-medium text-gray-500 mb-1">Sanksi Default dari Jenis</label><div class="px-3 py-2.5 rounded-xl border border-cool-200 bg-cool-50 font-mono font-bold text-sm text-navy-700" id="sSanksiDefault">'+fRp(defaultSanksi)+'</div><div class="fg-hint" style="margin-top:2px"><i class="fas fa-calculator text-green-400"></i>Dihitung dari jenis pelatihan</div></div>'
+    +'<div class="md:col-span-2"><label class="block text-xs font-medium text-gray-500 mb-1">Sanksi Kustom (Rp) <span class="text-gray-400 font-normal">— kosongkan = gunakan default</span></label><div class="flex items-center gap-3"><input id="sSanksiNilai" type="number" value="'+(isCustom?(S.set.sanksiNilai||''):'')+'" min="0" class="flex-1 px-3 py-2.5 rounded-xl border border-cool-200 text-sm font-mono" placeholder="Kosongkan untuk gunakan default ('+fRp(defaultSanksi)+')">' 
+    +(isCustom?'<button onclick="document.getElementById(\'sSanksiNilai\').value=\'\';updSettingsSanksiPreview()" class="btn-g px-3 py-2.5 rounded-xl text-xs font-medium whitespace-nowrap"><i class="fas fa-undo mr-1"></i>Reset ke Default</button>':'')
+    +'</div><div class="fg-hint" style="margin-top:2px"><i class="fas fa-pen text-gold-500"></i>Isi angka di sini untuk menimpa nilai default. Kosongkan jika ingin menggunakan nilai default jenis pelatihan.</div></div>'
+    +'<div><label class="block text-xs font-medium text-gray-500 mb-1">Sanksi Aktif (yang dipakai)</label><div class="px-3 py-2.5 rounded-xl border-2 font-mono font-bold text-sm '+(isCustom?'border-gold-400 text-gold-700 bg-gold-50':'border-green-300 text-green-700 bg-green-50')+'" id="sSanksiPreview">'+fRp(effectiveSanksi)+'</div><div class="fg-hint" style="margin-top:2px"><i class="fas '+(isCustom?'fa-star text-gold-500':'fa-check-circle text-green-500')+'"></i>'+(isCustom?'Kustom — mengesampingkan default '+fRp(defaultSanksi):'Default — sesuai jenis pelatihan')+'</div></div>'
+    +'</div></div>'
+    +'<div><h3 class="font-semibold text-sm text-gold-700 flex items-center gap-2 mb-4"><i class="fas fa-calendar-alt"></i> Tanggal Default SE2026</h3><div class="bg-amber-50 rounded-xl p-3 text-xs text-amber-800 mb-4 flex items-start gap-2"><i class="fas fa-shield-alt mt-0.5"></i><div><strong>Snapshot:</strong> Tanggal dikunci ke data kontrak saat disimpan. Mengubah di sini <b>tidak mengubah</b> kontrak lama.</div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-xs font-medium text-gray-500 mb-1">Honor Maksimal (Rp) <span class="text-red-400">*</span></label><input id="sHonor" type="number" value="'+s.honorMaks+'" min="0" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm font-mono"></div><div><label class="block text-xs font-medium text-gray-500 mb-1">Tgl TTD Default</label><input id="sTgl" type="date" value="'+s.tglTandaTangan+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm">'+(s.tglTandaTangan?'<div class="fg-hint" style="margin-top:2px"><i class="fas fa-calendar-check text-green-400"></i>'+fTglShort(s.tglTandaTangan)+'</div>':'<div class="fg-hint" style="margin-top:2px"><i class="fas fa-exclamation-circle text-amber-400"></i>Belum diisi</div>')+'</div><div><label class="block text-xs font-medium text-gray-500 mb-1">Tgl Selesai Default</label><input id="sTglSelesai" type="date" value="'+s.tglSelesai+'" class="w-full px-3 py-2.5 rounded-xl border border-cool-200 text-sm"><div class="fg-hint" style="margin-top:2px"><i class="fas '+(s.tglSelesai?'fa-lock text-green-400':'fa-magic text-blue-400')+'"></i>'+(s.tglSelesai?'Manual: '+fTglShort(s.tglSelesai):'Kosongkan = 31 Agustus 2026')+'</div></div></div><div class="bg-gradient-to-br from-navy-900 to-navy-800 rounded-xl p-4 text-white mt-4"><div class="flex flex-wrap gap-6 text-xs"><div><span class="text-blue-300/50 block mb-1">PERIODE SE2026</span><span class="text-lg font-bold">Juni – Agustus 2026</span></div><div><span class="text-blue-300/50 block mb-1">TTD DEFAULT</span><span class="text-blue-200 font-medium">'+fTglShort(s.tglTandaTangan||'-')+'</span></div><div><span class="text-blue-300/50 block mb-1">SELESAI</span><span class="text-blue-200 font-medium">'+fTglShort(s.tglSelesai||'31 Agustus 2026')+'</span></div><div><span class="text-blue-300/50 block mb-1">HONOR MAKS</span><span class="text-gold-400 font-semibold">'+fRp(s.honorMaks)+'</span></div><div><span class="text-blue-300/50 block mb-1">PELATIHAN</span><span class="text-blue-200 font-medium">'+(s.jenisPelatihan||'Fullday')+'</span></div><div><span class="text-blue-300/50 block mb-1">SANKSI AKTIF</span><span class="'+(isCustom?'text-gold-300':'text-rose-300')+' font-semibold">'+fRp(effectiveSanksi)+(isCustom?' <i class="fas fa-star" style="font-size:8px"></i> kustom':'')+'</span></div></div></div></div><div class="flex justify-end"><button onclick="saveSettings()" class="btn-p px-8 py-3 rounded-xl text-sm font-semibold"><i class="fas fa-save mr-2"></i>Simpan Pengaturan</button></div></div></div>';
+}
+
+/* ===== updSettingsSanksiPreview: update tampilan sanksi saat edit manual ===== */
+function updSettingsSanksiPreview(){
+    var jenis=ssVal('ss-pelatihan-setting')||'Fullday';
+    var defaultVal=SANKSI_CONFIG[jenis]||0;
+    var manualInput=$('sSanksiNilai');
+    var manualVal=manualInput?Number(manualInput.value):NaN;
+    var isCustom=!isNaN(manualVal)&&manualInput&&manualInput.value.trim()!=='';
+    var effective=isCustom?manualVal:defaultVal;
+
+    var defEl=$('sSanksiDefault');if(defEl)defEl.textContent=fRp(defaultVal);
+    var prevEl=$('sSanksiPreview');if(prevEl){
+        prevEl.textContent=fRp(effective);
+        if(isCustom){prevEl.className='px-3 py-2.5 rounded-xl border-2 font-mono font-bold text-sm border-gold-400 text-gold-700 bg-gold-50'}
+        else{prevEl.className='px-3 py-2.5 rounded-xl border-2 font-mono font-bold text-sm border-green-300 text-green-700 bg-green-50'}
+    }
+    var hintEl=$('sSanksiPreview');
+    if(hintEl){
+        var parent=hintEl.parentElement;
+        var hintDiv=parent.querySelector('.fg-hint');
+        if(hintDiv){
+            if(isCustom){hintDiv.innerHTML='<i class="fas fa-star text-gold-500"></i>Kustom — mengesampingkan default '+fRp(defaultVal)}
+            else{hintDiv.innerHTML='<i class="fas fa-check-circle text-green-500"></i>Default — sesuai jenis pelatihan'}
+        }
+    }
+}
 
 function saveSettings(){
     var ppkNama=$('sPpkNm').value.trim(),ppkNip=$('sPpkNip').value.trim(),bpsNama=$('sBpsNm').value.trim(),bpsAlamat=$('sBpsAl').value.trim(),kota=$('sKota').value.trim(),honorMaks=Number($('sHonor').value)||0;
     var jenisPelatihan=ssVal('ss-pelatihan-setting')||'Fullday';
+    var sanksiNilaiRaw=$('sSanksiNilai').value.trim();
     if(!ppkNama)return toast('Nama PPK wajib diisi','warning');
     if(!ppkNip)return toast('NIP PPK wajib diisi','warning');
     if(!bpsNama)return toast('Nama BPS wajib diisi','warning');
@@ -648,7 +623,9 @@ function saveSettings(){
     if(!honorMaks||honorMaks<=0)return toast('Honor maksimal harus > 0','warning');
     if(!jenisPelatihan)return toast('Jenis pelatihan wajib diisi','warning');
     S.set.ppkNama=ppkNama;S.set.ppkNip=ppkNip;S.set.bpsNama=bpsNama;S.set.bpsAlamat=bpsAlamat;S.set.kota=kota;S.set.honorMaks=honorMaks;S.set.tglTandaTangan=$('sTgl').value;S.set.tglSelesai=$('sTglSelesai').value.trim()||'';S.set.jenisPelatihan=jenisPelatihan;
-    regenAllNomor();aSave();render();toast('Pengaturan berhasil disimpan')
+    /* Simpan sanksi kustom: jika diisi angka, simpan; jika kosong, simpan string kosong */
+    S.set.sanksiNilai=sanksiNilaiRaw===''?'':sanksiNilaiRaw;
+    regenAllNomor();aSave();render();toast('Pengaturan berhasil disimpan');
 }
 
 var impMode='merge';
@@ -656,7 +633,7 @@ function rExIm(){return'<div class="fade-in max-w-3xl mx-auto"><div class="mb-6"
 function exJSON(){if(!S.mitra.length&&!S.set.ppkNama&&!S.dbMitra.length)return toast('Tidak ada data','warning');dl(JSON.stringify({version:'SE2026-1.0',app:'KONTRAK_SE2026',exportDate:new Date().toISOString(),settings:S.set,mitra:S.mitra,dbMitra:S.dbMitra},null,2),'se2026-backup-'+new Date().toISOString().split('T')[0]+'.json','application/json');toast('Export berhasil')}
 function exCSV(){if(!S.mitra.length)return toast('Tidak ada data','warning');var h=['No','Nomor','Nama','NIK','Alamat','Telepon','Jenis','Pelatihan','Sanksi','TTD','Selesai','Honor','NilaiTermin1','NilaiTermin2','Vol1','Sat1','Vol2','Sat2','Vol3','Sat3','Vol4','Sat4'];var rows=[];S.mitra.forEach(function(m,i){rows.push([i+1,m.nomorKontrak,m.nama,m.nik,m.alamat,m.noTelepon,m.jenisPetugas==='PML'?'PML':'PPL',m.jenisPelatihan||'-',m.sanksiPelatihan||0,m.tglTandaTangan||'-',m.tglSelesai||'-',m.totalHonor,m.nilaiTermin1||0,m.nilaiTermin2||0,m.lampVol1||'',m.lampSat1||'',m.lampVol2||'',m.lampSat2||'',m.lampVol3||'',m.lampSat3||'',m.lampVol4||'',m.lampSat4||''])});dl('\ufeff'+[h].concat(rows).map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"'}).join(',')}).join('\n'),'se2026-'+new Date().toISOString().split('T')[0]+'.csv','text/csv;charset=utf-8');toast('CSV berhasil')}
 function dl(c,f,t){var b=new Blob([c],{type:t}),u=URL.createObjectURL(b),a=document.createElement('a');a.href=u;a.download=f;a.click();URL.revokeObjectURL(u)}
-function imJSON(file){if(!file)return;var r=new FileReader();r.onload=function(e){try{var d=JSON.parse(e.target.result);if(!d.mitra&&!d.settings&&!d.dbMitra)throw new Error('Format tidak valid');if(impMode==='replace'){if(d.settings)Object.assign(S.set,d.settings);S.mitra=d.mitra||[];S.dbMitra=d.dbMitra||[]}else{if(d.settings&&!S.set.ppkNama)Object.assign(S.set,d.settings);var exI=new Set(S.mitra.map(function(m){return m.id}));(d.mitra||[]).forEach(function(m){if(exI.has(m.id))m.id=gid();S.mitra.push(m)});var exD=new Set(S.dbMitra.map(function(m){return m.id}));(d.dbMitra||[]).forEach(function(m){if(exD.has(m.id))m.id=gid();S.dbMitra.push(m)})}S.dbMitra.forEach(function(m){if(m.aktif===undefined)m.aktif=true});S.mitra.forEach(function(m){if(m.nilaiTermin1===undefined)m.nilaiTermin1=0;if(m.nilaiTermin2===undefined)m.nilaiTermin2=0;if(m.lampVol1===undefined)m.lampVol1='';if(m.lampSat1===undefined)m.lampSat1='';if(m.lampVol2===undefined)m.lampVol2='';if(m.lampSat2===undefined)m.lampSat2='';if(m.lampVol3===undefined)m.lampVol3='';if(m.lampSat3===undefined)m.lampSat3='';if(m.lampVol4===undefined)m.lampVol4='';if(m.lampSat4===undefined)m.lampSat4='';if(m.jenisPelatihan===undefined)m.jenisPelatihan='Fullday'});if(!S.set.jenisPelatihan)S.set.jenisPelatihan='Fullday';regenAllNomor();aSave();render();toast('Berhasil mengimpor')}catch(err){toast('Gagal: '+err.message,'error')}};r.readAsText(file)}
+function imJSON(file){if(!file)return;var r=new FileReader();r.onload=function(e){try{var d=JSON.parse(e.target.result);if(!d.mitra&&!d.settings&&!d.dbMitra)throw new Error('Format tidak valid');if(impMode==='replace'){if(d.settings)Object.assign(S.set,d.settings);S.mitra=d.mitra||[];S.dbMitra=d.dbMitra||[]}else{if(d.settings&&!S.set.ppkNama)Object.assign(S.set,d.settings);var exI=new Set(S.mitra.map(function(m){return m.id}));(d.mitra||[]).forEach(function(m){if(exI.has(m.id))m.id=gid();S.mitra.push(m)});var exD=new Set(S.dbMitra.map(function(m){return m.id}));(d.dbMitra||[]).forEach(function(m){if(exD.has(m.id))m.id=gid();S.dbMitra.push(m)})}S.dbMitra.forEach(function(m){if(m.aktif===undefined)m.aktif=true});S.mitra.forEach(function(m){if(m.nilaiTermin1===undefined)m.nilaiTermin1=0;if(m.nilaiTermin2===undefined)m.nilaiTermin2=0;if(m.lampVol1===undefined)m.lampVol1='';if(m.lampSat1===undefined)m.lampSat1='';if(m.lampVol2===undefined)m.lampVol2='';if(m.lampSat2===undefined)m.lampSat2='';if(m.lampVol3===undefined)m.lampVol3='';if(m.lampSat3===undefined)m.lampSat3='';if(m.lampVol4===undefined)m.lampVol4='';if(m.lampSat4===undefined)m.lampSat4='';if(m.jenisPelatihan===undefined)m.jenisPelatihan='Fullday'});if(!S.set.jenisPelatihan)S.set.jenisPelatihan='Fullday';if(S.set.sanksiNilai===undefined)S.set.sanksiNilai='';regenAllNomor();aSave();render();toast('Berhasil mengimpor')}catch(err){toast('Gagal: '+err.message,'error')}};r.readAsText(file)}
 
 function _printCSS(isMulti){return'<style>'
 +'@page{size:A4 portrait;margin:18mm 19mm 17mm 25mm}'
@@ -739,21 +716,44 @@ function getSampleDbMitra(){var n=gid;return[
 {id:n(),nama:'Zuryetti',nik:'1471094711780021',noHp:'081378129786',alamat:'Jln Angrek Prum Vaishatama Blok D9',aktif:true,createdAt:new Date().toISOString()}
 ]}
 function loadSample(){
-S.set={ppkNama:'Benny Dwi Kifana, ST, M.Si',ppkNip:'198812232014031002',bpsNama:'Badan Pusat Statistik Kota Pekanbaru',bpsAlamat:'Jl. Rawa Indah No. 2',kota:'Pekanbaru',honorMaks:2500000,tglTandaTangan:'2026-05-15',tglSelesai:'2026-08-31',jenisPelatihan:'Fullday'};
+S.set={ppkNama:'Benny Dwi Kifana, ST, M.Si',ppkNip:'198812232014031002',bpsNama:'Badan Pusat Statistik Kota Pekanbaru',bpsAlamat:'Jl. Rawa Indah No. 2',kota:'Pekanbaru',honorMaks:2500000,tglTandaTangan:'2026-05-15',tglSelesai:'2026-08-31',jenisPelatihan:'Fullday',sanksiNilai:''};
 var now=new Date().toISOString();
 S.mitra=S.dbMitra.map(function(d,i){
-var isUB=i<2;var isFullboard=i>=3&&i<6;
-var jp=isUB?'PML':'PPL';var pelatihan=S.set.jenisPelatihan||'Fullday';
-var cfg=HONOR_CONFIG[jp];var sanksi=SANKSI_CONFIG[pelatihan];
+var isUB=i<2;var jp=isUB?'PML':'PPL';var pelatihan=S.set.jenisPelatihan||'Fullday';
+var cfg=HONOR_CONFIG[jp];var sanksi=getEffectiveSanksi();
 return{id:gid(),nomorKontrak:'',nama:d.nama,nik:d.nik,alamat:d.alamat,noTelepon:d.noHp,tglTandaTangan:isUB?'2026-05-15':'2026-06-01',tglSelesai:isUB?'2026-07-31':'2026-08-31',jenisPetugas:jp,jenisPelatihan:pelatihan,totalHonor:cfg.totalHonor,sanksiPelatihan:sanksi,nilaiTermin1:cfg.nilaiTermin1,nilaiTermin2:cfg.nilaiTermin2,lampVol1:isUB?'4':'150',lampSat1:DEFAULT_SATUAN[0],lampVol2:isUB?'4':'150',lampSat2:DEFAULT_SATUAN[1],lampVol3:isUB?'4':'150',lampSat3:DEFAULT_SATUAN[2],lampVol4:isUB?'4':'150',lampSat4:DEFAULT_SATUAN[3],createdAt:new Date(now).getTime()+i,updatedAt:now};
 });
 regenAllNomor();aSave();render();toast('Data contoh dimuat — '+S.mitra.length+' kontrak SE2026 (2 PML + 8 PPL).')
 }
 
-function render(){updBadges();var mc=$('mc');if(!mc)return;switch(S.v){case 'dashboard':mc.innerHTML=rDash();break;case 'dbmitra':mc.innerHTML=rDbMitra();setTimeout(function(){updDbList()},0);break;case 'mitra':mc.innerHTML=rMitra();setTimeout(function(){updMitraList()},0);break;case 'settings':mc.innerHTML=rSettings();setTimeout(function(){ssInit('ss-pelatihan-setting',function(val){var preview=$('sSanksiPreview');if(preview)preview.textContent=fRp(SANKSI_CONFIG[val]||0)})},0);break;case 'exim':mc.innerHTML=rExIm();break;default:mc.innerHTML=rDash()}mc.scrollTop=0;window.scrollTo({top:0,behavior:'auto'})}
+function render(){updBadges();var mc=$('mc');if(!mc)return;switch(S.v){case 'dashboard':mc.innerHTML=rDash();break;case 'dbmitra':mc.innerHTML=rDbMitra();setTimeout(function(){updDbList()},0);break;case 'mitra':mc.innerHTML=rMitra();setTimeout(function(){updMitraList()},0);break;case 'settings':mc.innerHTML=rSettings();setTimeout(function(){
+    ssInit('ss-pelatihan-setting',function(val){
+        /* Saat jenis pelatihan berubah, update preview default & aktif */
+        var defaultVal=SANKSI_CONFIG[val]||0;
+        var defEl=$('sSanksiDefault');if(defEl)defEl.textContent=fRp(defaultVal);
+        /* Jika sanksi kustom kosong, preview ikut default */
+        var manualInput=$('sSanksiNilai');
+        var isCustom=manualInput&&manualInput.value.trim()!=='';
+        var effective=isCustom?Number(manualInput.value):defaultVal;
+        var prevEl=$('sSanksiPreview');if(prevEl){
+            prevEl.textContent=fRp(effective);
+            if(isCustom){prevEl.className='px-3 py-2.5 rounded-xl border-2 font-mono font-bold text-sm border-gold-400 text-gold-700 bg-gold-50'}
+            else{prevEl.className='px-3 py-2.5 rounded-xl border-2 font-mono font-bold text-sm border-green-300 text-green-700 bg-green-50'}
+        }
+        /* Update placeholder sanksi kustom */
+        if(manualInput)manualInput.placeholder='Kosongkan untuk gunakan default ('+fRp(defaultVal)+')';
+    });
+    /* Pasang event listener real-time pada input sanksi kustom */
+    var sanksiInput=$('sSanksiNilai');
+    if(sanksiInput){
+        sanksiInput.removeEventListener('input',updSettingsSanksiPreview);
+        sanksiInput.addEventListener('input',updSettingsSanksiPreview);
+    }
+},0);break;case 'exim':mc.innerHTML=rExIm();break;default:mc.innerHTML=rDash()}mc.scrollTop=0;window.scrollTo({top:0,behavior:'auto'})}
 
 loadS();
 S.mitra.forEach(function(m){if(m.nilaiTermin1===undefined)m.nilaiTermin1=0;if(m.nilaiTermin2===undefined)m.nilaiTermin2=0;if(m.lampVol1===undefined)m.lampVol1='';if(m.lampSat1===undefined)m.lampSat1=DEFAULT_SATUAN[0];if(m.lampVol2===undefined)m.lampVol2='';if(m.lampSat2===undefined)m.lampSat2=DEFAULT_SATUAN[1];if(m.lampVol3===undefined)m.lampVol3='';if(m.lampSat3===undefined)m.lampSat3=DEFAULT_SATUAN[2];if(m.lampVol4===undefined)m.lampVol4='';if(m.lampSat4===undefined)m.lampSat4=DEFAULT_SATUAN[3];if(m.jenisPelatihan===undefined)m.jenisPelatihan='Fullday';});
+if(S.set.sanksiNilai===undefined)S.set.sanksiNilai='';
 var initView=S.v||'dashboard';
 document.querySelectorAll('.nav-item').forEach(function(el){el.classList.toggle('active',el.dataset.v===initView)});
 var initTitle=$('sbTitle');
